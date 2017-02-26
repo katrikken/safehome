@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"> 
+
+	<h:head>
+		<meta charset="utf-8"></meta>
+	    <title>Safe Home</title>
+	    <link rel="stylesheet" type="text/css" href="style.css"></link>
+	</h:head> 
+	<h:body> 
+		<div class="content">
+	        <h1 class="welcome" >Welcome to the Safe Home Application!</h1>     
+	        <h:form>
+	            <table class="form" border="0">              
+	                <tr>
+	                    <td>login:</td>
+	                    <td><h:inputText value="#{pagesService.login}" required="true"/></td>                  
+	                </tr>
+	                <tr>
+	                    <td>password:</td>
+	                    <td><h:inputSecret value="#{pagesService.password}" required="true"/></td>                   
+	                </tr>       
+	                <tr>
+	                    <td> </td>
+	                    <td><h:commandButton value="Sign in" action="#{pagesService.checkUser()}"/></td>                   
+	                </tr>         
+	            </table>            
+	        </h:form>
+	    </div>
+	</h:body> 
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"> 
+
+	<h:head>
+		<meta charset="utf-8"></meta>
+	    <title>Safe Home</title>
+	    <link rel="stylesheet" type="text/css" href="style.css"></link>
+	</h:head> 
+	<h:body> 
+		<div class="content">
+			<h1 class="welcome" >List of users.</h1>
+	        <table class="form" border="0">        
+	        	<ui:repeat var="i" value="#{pagesService.getUsers()}">
+ 					<tr>
+ 						<td>#{i.name}</td>
+ 						<td><h:commandButton value="Delete" action="#{pagesService.deleteUser(i)}"/></td>
+ 					</tr>
+				</ui:repeat>                      
+	        </table>            
+	        <div><h:commandButton value="Add new user" action="#{pagesService.createUser()}"/> </div>
+	    </div>
+	</h:body> 
+</html>
