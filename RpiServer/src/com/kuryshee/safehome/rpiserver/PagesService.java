@@ -1,30 +1,34 @@
 package com.kuryshee.safehome.rpiserver;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 
 @ManagedBean(name="pagesService")
 @RequestScoped
 public class PagesService {
 
-    private String CONFIG = ".config";
-    private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
-    private String KEY = "key ";
+    private String CONFIG = "/WEB-INF/config.txt";
 	
 	private String login;
 	
 	private String password;
 	
-	private List<UserBean> userBeans = new ArrayList<>();
+	private String userName;
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}	
 	
 	public String getPassword() {
 		return password;
@@ -58,66 +62,18 @@ public class PagesService {
 	 * @return true if data are valid.
 	 */
 	private boolean checkUserRequest(){	
-		try(BufferedReader br = new BufferedReader(new FileReader(CONFIG))){
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(ec.getResourceAsStream(CONFIG)))){
 			String conf = br.readLine();
-			String params[] = conf.split(" ");
-			if (params[0] == login && params[1] == password){
-				return true;
+			String params[] = conf.split(" ");		
+			if (params[0].equals(login) && params[1].equals(password)){
+				Logger.getLogger("Page Service").log(Level.INFO, "Login and password are correct");
+				return true;			
 			}
 		
 		} catch (IOException e) {
 			Logger.getLogger("Page Service").log(Level.SEVERE, e.getMessage());
 		}
 		return false;
-	}
-	
-	public List<UserBean> getUsers(){
-		setUserBeans();
-		return userBeans;
-	}
-	
-	private void setUserBeans(){
-		try(BufferedReader br = new BufferedReader(new FileReader(USERCONFIG))){
-			String conf;
-			
-			while( (conf = br.readLine()) != null){
-				String params[] = conf.substring(0, KEY.length()).split("-");
-				UserBean bean = new UserBean();
-				bean.setKey(params[0]);
-				bean.setName(params[1]);
-				userBeans.add(bean);
-			}		
-		
-		} catch (IOException e) {
-			Logger.getLogger("Page Service").log(Level.SEVERE, e.getMessage());
-		}
-	}
-	
-	public String deleteUser(UserBean user){
-		File users = new File(USERCONFIG);
-		try(FileOutputStream fstream = new FileOutputStream(users, false)){
-			userBeans.remove(user);
-			for(UserBean bean : userBeans){
-				String line = KEY + bean.getKey() + "-" + bean.getName() + '\n';
-				byte[] bytes = line.getBytes();
-				fstream.write(bytes);
-			}
-			
-		} catch (IOException e) {
-			Logger.getLogger("Page Service").log(Level.SEVERE, e.getMessage());
-		} 	
-		
-		return "userpage";
-	}
-	
-	public String createUser(){
-		return "newuser";
-	}
-	
-	public String createUserBean(){
-		//save bean to the file
-		//if card tag is avialable then userpage
-		//else newuser
-		return "userpage";
 	}
 }
