@@ -1,0 +1,9 @@
+h1.welcome{
+    text-align: center;
+    }
+form{
+    position:absolute;
+    left: 40%;
+    width:20%;
+    border:1px solid black;
+    } 
