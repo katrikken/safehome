@@ -16,12 +16,17 @@ import javax.servlet.ServletContext;
 @RequestScoped
 public class NewUserPage {
 	
-	private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
+	//private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
+	private String USERCONFIG = "keys.txt";
 	private String KEY = "key ";
 	
 	private String userName;
 	
 	private String cardCode;
+	
+	public NewUserPage(){
+		RpiServlet.tasks.add(RpiServlet.REQ_READCARD);
+	}
 
 	private String getCardCode() {
 		if(cardCode == null){
@@ -33,10 +38,6 @@ public class NewUserPage {
 	private void setCardCode(String cardCode) {
 		this.cardCode = cardCode;
 	}
-
-	public NewUserPage(){
-		RpiServlet.tasks.add("readcard");
-	}
 	
 	public String getUserName() {
 		if(userName == null){
@@ -44,9 +45,11 @@ public class NewUserPage {
 		}
 		return userName;
 	}
-
+	
+	
 	public void setUserName(String userName) {
-		this.userName = userName;
+		
+		this.userName = Sanitizer.sanitize(userName);
 	}
 	
 	public String createUserBean(){
@@ -65,7 +68,7 @@ public class NewUserPage {
 			
 			try(BufferedWriter bw = new BufferedWriter(new FileWriter(USERCONFIG))){
 				bw.write(KEY + getCardCode() + "-" + getUserName() + '\n');
-				
+				RpiServlet.tasks.add(RpiServlet.COMMAND_SAVEUSER);
 				return "userpage";
 			} catch (IOException e) {
 				Logger.getLogger("NewUserPage").log(Level.SEVERE, e.getMessage());
@@ -73,7 +76,8 @@ public class NewUserPage {
 		}
 		else{
 			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage(null, new FacesMessage("You can't save the new user!"));
+			context.addMessage(null, new FacesMessage("You can't save the new user!\n"
+					+ "Put your card to the reader and provide valid name."));
 		}
 		
 		return "newuser";

@@ -54,11 +54,12 @@ public class PagesService {
 		if(checkUserRequest()){
 			return "userpage";
 		}
-		return "index";
+
+		return "index";		
 	}
 	
 	/**
-	 * This method checks configuration file if user sign in data are valid.
+	 * This method compares configuration file data with user sign in data and decides if they are valid.
 	 * @return true if data are valid.
 	 */
 	private boolean checkUserRequest(){	
@@ -74,6 +75,7 @@ public class PagesService {
 		} catch (IOException e) {
 			Logger.getLogger("Page Service").log(Level.SEVERE, e.getMessage());
 		}
+		Logger.getLogger("Page Service").log(Level.INFO, "Login and password are incorrect");
 		return false;
 	}
 }

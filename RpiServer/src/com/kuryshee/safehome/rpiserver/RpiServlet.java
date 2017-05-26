@@ -22,9 +22,11 @@ public class RpiServlet extends HttpServlet {
 	private static final String servletPath = "/RpiServer/RpiServlet";
 	
 	public static final String REQ_CHECKTASK = "/checktask";
-	public static final String REQ_KEYDETECTED = "/detected";
+	public static final String REQ_READCARD = "/read";
+    public static final String COMMAND_SAVEUSER = "/saveuser";
 	public static final String NO_ANSWER = "no answer";
 	public static final String OK_ANSWER = "ok";
+	public static final String ERROR_ANSWER = "error";
 	
 	public static ConcurrentLinkedQueue<String> requests = new ConcurrentLinkedQueue<>();
 	public static ConcurrentLinkedQueue<String> tasks = new ConcurrentLinkedQueue<>();
@@ -52,21 +54,31 @@ public class RpiServlet extends HttpServlet {
 		
 		String answer = processor.process(command, query);
 		
-		if (processor.cardIsRead()){
-			ServletContext sc = getServletContext();
-		    sc.setAttribute("card", processor.getKey());
-		    log.log(Level.INFO, "-- Key is passed to the servlet context");
-		}
-		
 		response.getWriter().println(answer);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
+		String path = request.getRequestURI();
+		if(path.startsWith(servletPath + REQ_READCARD, 0)){
+			try{
+				String rpiId = request.getParameter("rpi"); 
+				log.log(Level.INFO, "-- Got key from RPi " + rpiId);
+				String cardID = request.getParameter("card"); 
+		   
+				ServletContext sc = getServletContext();
+				sc.setAttribute("card", cardID);
+				log.log(Level.INFO, "-- Key is passed to the servlet context");
+			}
+			catch(Exception e){
+				response.getWriter().println(ERROR_ANSWER);
+				log.log(Level.WARNING, "--Failed to fetch card data with an exception", e);
+			}
+		}
+		else{
+			log.warning("--Invalid POST request " + path);
+		}		 
 	}
-
 }
