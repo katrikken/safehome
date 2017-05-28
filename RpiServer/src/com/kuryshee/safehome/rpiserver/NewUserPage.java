@@ -3,6 +3,7 @@ package com.kuryshee.safehome.rpiserver;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,7 +15,7 @@ import javax.servlet.ServletContext;
 
 @ManagedBean(name="newUserPage")
 @RequestScoped
-public class NewUserPage {
+public class NewUserPage implements Serializable{
 	
 	//private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
 	private String USERCONFIG = "keys.txt";

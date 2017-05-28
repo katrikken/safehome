@@ -18,7 +18,12 @@
 		        	<ui:repeat var="i" value="#{userPage.getUsers()}">
 	 					<tr>
 	 						<td><h:outputText value="#{i.name}"/></td>
-	 						<td><h:commandButton value="Delete" action="#{userPage.deleteUser(i)}"/></td>
+	 						<td>
+	 							<h:commandButton 
+	 								value="Delete" 
+	 								action="#{userPage.deleteUser(i)}"
+	 								onclick="return confirm('Are you sure?')"/>
+	 						</td>
 	 					</tr>
 					</ui:repeat>                      
 		        </table>    

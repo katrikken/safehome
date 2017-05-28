@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,7 +16,7 @@ import javax.faces.bean.RequestScoped;
 
 @ManagedBean(name="userPage")
 @RequestScoped
-public class UserPage {
+public class UserPage implements Serializable {
 	//private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
 	private String USERCONFIG = "keys.txt";
 	private String KEY = "key ";

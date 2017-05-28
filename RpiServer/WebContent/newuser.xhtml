@@ -17,7 +17,12 @@
 	    	<table class="form" border="0">              
 	        	<tr>
 	        		<td>Name:</td>
-	                <td><h:inputText value="#{newUserPage.userName}" required="true"/></td>                   
+	                <td>
+	                	<h:inputText 
+	                		value="#{newUserPage.userName}" 
+	                		required="true"
+	                		requiredMessage="Enter the new user name!"/>
+	                </td>                   
 	            </tr>       
 	            <tr>
 	                <td> </td>

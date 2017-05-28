@@ -16,15 +16,25 @@
 	            <table class="form" border="0">              
 	                <tr>
 	                    <td>login:</td>
-	                    <td><h:inputText value="#{pagesService.login}" required="true"/></td>                  
+	                    <td>
+	                    	<h:inputText 
+	                    		value="#{indexPage.login}" 
+	                    		required="true" 
+	                    		requiredMessage="Enter the login!"/>
+	                    </td>                  
 	                </tr>
 	                <tr>
 	                    <td>password:</td>
-	                    <td><h:inputSecret value="#{pagesService.password}" required="true"/></td>                   
+	                    <td>
+	                    	<h:inputSecret 
+	                    		value="#{indexPage.password}" 
+	                    		required="true" 
+	                    		requiredMessage="Enter the password!"/>
+	                    </td>                   
 	                </tr>       
 	                <tr>
 	                    <td> </td>
-	                    <td><h:commandButton value="Sign in" action="#{pagesService.checkUser()}"/></td>                   
+	                    <td><h:commandButton value="Sign in" action="#{indexPage.checkUser()}"/></td>                   
 	                </tr>         
 	            </table>            
 	        </h:form>
