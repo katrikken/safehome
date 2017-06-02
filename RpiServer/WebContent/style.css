@@ -3,7 +3,10 @@ h1.welcome{
     }
 form{
     position:absolute;
-    left: 30%;
-    width:30%;
     border:1px solid black;
+    display: inline-block;
+    text-align: center;
     } 
+.userinfo{
+	text-align: right;
+}

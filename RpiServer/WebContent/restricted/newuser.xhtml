@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"> 
+
+<h:head>
+		<meta charset="utf-8"></meta>
+	    <title>Safe Home</title>
+	    <link rel="stylesheet" type="text/css" href="../style.css"></link>
+</h:head> 
+<body> 
+	<div class="content">
+		<h1 class="welcome" >Add new user</h1>   
+		<div class="userinfo">
+			You are logged as #{newUserPage.userName}
+		</div>	
+		<h:form>
+			<p>Put your card to the card reader.</p>
+	    	<table class="form" border="0">              
+	        	<tr>
+	        		<td>Name:</td>
+	                <td>
+	                	<h:inputText 
+	                		value="#{newUserPage.name}" 
+	                		required="true"
+	                		requiredMessage="Enter the new user name!"/>
+	                </td>                   
+	            </tr>       
+	            <tr>
+	                <td> </td>
+	                <td><h:commandButton value="Save" action="#{newUserPage.createUserBean()}"/></td>  
+	            </tr>
+	    	</table>      
+	    	<h:messages globalOnly="true" />      
+		</h:form>
+	</div>
+</body> 
+</html>

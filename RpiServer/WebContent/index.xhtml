@@ -7,36 +7,40 @@
 	<h:head>
 		<meta charset="utf-8"></meta>
 	    <title>Safe Home</title>
-	    <link rel="stylesheet" type="text/css" href="style.css"></link>
+	    <link rel="stylesheet" type="text/css" href="./style.css"></link>
 	</h:head> 
 	<h:body> 
 		<div class="content">
 	        <h1 class="welcome" >Welcome to the Safe Home Application!</h1>     
-	        <h:form>
-	            <table class="form" border="0">              
-	                <tr>
-	                    <td>login:</td>
-	                    <td>
-	                    	<h:inputText 
-	                    		value="#{indexPage.login}" 
-	                    		required="true" 
-	                    		requiredMessage="Enter the login!"/>
-	                    </td>                  
-	                </tr>
-	                <tr>
-	                    <td>password:</td>
-	                    <td>
-	                    	<h:inputSecret 
-	                    		value="#{indexPage.password}" 
-	                    		required="true" 
-	                    		requiredMessage="Enter the password!"/>
-	                    </td>                   
-	                </tr>       
-	                <tr>
-	                    <td> </td>
-	                    <td><h:commandButton value="Sign in" action="#{indexPage.checkUser()}"/></td>                   
-	                </tr>         
-	            </table>            
+	        <h:form class="myform">
+	        	<h:panelGroup rendered="#{not indexPage.loggedIn}">	
+		            <table class="form" border="0">              
+		                <tr>
+		                    <td>login:</td>
+		                    <td>
+		                    	<h:inputText 
+		                    		value="#{indexPage.userName}" 
+		                    		required="true" 
+		                    		requiredMessage="Enter the login!"/>
+		                    </td>                  
+		                </tr>
+		                <tr>
+		                    <td>password:</td>
+		                    <td>
+		                    	<h:inputSecret 
+		                    		value="#{indexPage.password}" 
+		                    		required="true" 
+		                    		requiredMessage="Enter the password!"
+		                    		id="userpswd"/>
+		                    	<h:message class="error" for="userpswd" id="pswdError" />
+		                    </td>                   
+		                </tr>       
+		                <tr>
+		                    <td> </td>
+		                    <td><h:commandButton value="Log in" action="#{indexPage.login}"/></td>                   
+		                </tr>         
+		            </table>      
+	            </h:panelGroup>      
 	        </h:form>
 	    </div>
 	</h:body> 

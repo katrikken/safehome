@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 
 @ManagedBean(name="userPage")
@@ -21,7 +23,18 @@ public class UserPage implements Serializable {
 	private String USERCONFIG = "keys.txt";
 	private String KEY = "key ";
 	
+	@ManagedProperty("#{indexPage.userName}")
+	private String userName;
+	
 	private List<UserBean> userBeans = new ArrayList<>();
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	public List<UserBean> getUsers(){
 		setUserBeans();

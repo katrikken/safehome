@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
@@ -21,9 +22,12 @@ public class NewUserPage implements Serializable{
 	private String USERCONFIG = "keys.txt";
 	private String KEY = "key ";
 	
-	private String userName;
-	
+	private String name;
+
 	private String cardCode;
+	
+	@ManagedProperty("#{indexPage.userName}")
+	private String userName;
 	
 	public NewUserPage(){
 		RpiServlet.tasks.add(RpiServlet.REQ_READCARD);
@@ -41,16 +45,23 @@ public class NewUserPage implements Serializable{
 	}
 	
 	public String getUserName() {
-		if(userName == null){
-			return "";
-		}
 		return userName;
 	}
 	
 	
-	public void setUserName(String userName) {
-		
-		this.userName = Sanitizer.sanitize(userName);
+	public void setUserName(String userName) {	
+		this.userName = userName;
+	}
+	
+	public String getName() {
+		if(name == null){
+			return "";
+		}
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = Sanitizer.sanitize(name);	
 	}
 	
 	public String createUserBean(){
@@ -83,5 +94,4 @@ public class NewUserPage implements Serializable{
 		
 		return "newuser";
 	}
-	
 }

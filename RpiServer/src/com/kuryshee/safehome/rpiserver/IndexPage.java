@@ -6,31 +6,55 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+/**
+ * This class implements a managed bean for the index page of the application.
+ * @author Ekaterina Kurysheva
+ */
 @ManagedBean(name="indexPage")
-@RequestScoped
+@SessionScoped
 public class IndexPage implements Serializable{
 
-    private String CONFIG = "/WEB-INF/config.txt";
+	/**
+	 * The attribute contains the path to the file with predefined log in parameters for the administrator user.
+	 */
+    private final String CONFIG = "/WEB-INF/config.txt";
 	
-	private String login;
+    /**
+     * Constant attribute for the HTTP session map. 
+     */
+    public static final String AUTH_KEY = "user.name";
 	
 	private String password;
 	
 	private String userName;
 	
+	/**
+	 * Getter for the property userName bounded to the user input.
+	 * @return user name from the input.
+	 */
 	public String getUserName() {
 		return userName;
 	}
 
+	/**
+	 * Setter for the property userName bounded to the user input.
+	 * @param userName is a user input to HTML form.
+	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}	
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getPassword() {
 		return password;
 	}
@@ -38,25 +62,22 @@ public class IndexPage implements Serializable{
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	public String getLogin() {
-		return login;
+	
+	public boolean isLoggedIn() {
+	    return FacesContext.getCurrentInstance().getExternalContext()
+	        .getSessionMap().get(AUTH_KEY) != null;
 	}
 
-	public void setLogin(String login) {
-		this.login = login;
-	}
-
-	/**
-	 * This method validates user sign in data.
-	 * @return user page if sign in was successful. 
-	 */
-	public String checkUser(){
+	public String login() {
 		if(checkUserRequest()){
-			return "userpage";
+			FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(
+			        AUTH_KEY, userName);
+			    return "restricted/userpage";
 		}
-
-		return "index";		
+		else{
+			FacesContext.getCurrentInstance().addMessage("myForm:userpswd", new FacesMessage("Incorrect password!", "Incorrect password!"));
+			return "index";
+		}	    
 	}
 	
 	/**
@@ -68,7 +89,7 @@ public class IndexPage implements Serializable{
 		try(BufferedReader br = new BufferedReader(new InputStreamReader(ec.getResourceAsStream(CONFIG)))){
 			String conf = br.readLine();
 			String params[] = conf.split(" ");		
-			if (params[0].equals(login) && params[1].equals(password)){
+			if (params[0].equals(userName) && params[1].equals(password)){
 				Logger.getLogger("Page Service").log(Level.INFO, "Login and password are correct");
 				return true;			
 			}
