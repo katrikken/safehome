@@ -14,6 +14,7 @@
     <servlet-name>Faces Servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
   </servlet-mapping>
+  <!-- The welcome page of the application. -->
   <welcome-file-list>
     <welcome-file>/index.xhtml</welcome-file>
   </welcome-file-list>
@@ -21,6 +22,7 @@
     <param-name>javax.faces.PROJECT_STAGE</param-name>
     <param-value>Development</param-value>
   </context-param>
+  <!-- Page access filter. -->
   <filter>
     <filter-name>AuthFilter</filter-name>
     <filter-class>com.kuryshee.safehome.rpiserver.AuthFilter</filter-class>
@@ -29,4 +31,13 @@
     <filter-name>AuthFilter</filter-name>
     <url-pattern>/restricted/*</url-pattern>
   </filter-mapping>
+  <!-- Session configurations. -->
+  <session-config>
+  	<session-timeout>30</session-timeout>
+  </session-config>
+  <!-- Redirecting to the welcome page when the session has expired. -->
+  <error-page>
+  	<exception-type>javax.faces.application.ViewExpiredException</exception-type>
+  	<location>/index.xhtml</location>
+  </error-page>
 </web-app>

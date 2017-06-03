@@ -45,47 +45,62 @@ public class IndexPage implements Serializable{
 
 	/**
 	 * Setter for the property userName bounded to the user input.
-	 * @param userName is a user input to HTML form.
+	 * @param userName is provided by user via HTML form.
 	 */
 	public void setUserName(String userName) {
-		this.userName = userName;
+		this.userName = Sanitizer.sanitize(userName);
 	}	
 	
 	/**
-	 * 
-	 * @return
+	 * Getter for the property password bounded to the user input.
+	 * @return password entered by user.
 	 */
 	public String getPassword() {
 		return password;
 	}
 
+	/**
+	 * Setter for the property password bounded to the user input.
+	 * @param password is provided by user via HTML form.
+	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
 	
+	/**
+	 * The method checks whether user is identified.
+	 * @return true if HTTP session has defined {@link #AUTH_KEY}.
+	 */
 	public boolean isLoggedIn() {
 	    return FacesContext.getCurrentInstance().getExternalContext()
 	        .getSessionMap().get(AUTH_KEY) != null;
 	}
 
+	/**
+	 * This method performs user logging in and page redirecting.
+	 * @return page name to which the user should be navigated. In case logging failed, the user is redirected to the same page.
+	 */
 	public String login() {
 		if(checkUserRequest()){
-			FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(
-			        AUTH_KEY, userName);
-			    return "restricted/userpage";
+			FacesContext.getCurrentInstance().getExternalContext()
+				.getSessionMap().put(AUTH_KEY, userName);
+			
+			return "restricted/userpage";
 		}
 		else{
-			FacesContext.getCurrentInstance().addMessage("myForm:userpswd", new FacesMessage("Incorrect password!", "Incorrect password!"));
+			FacesContext.getCurrentInstance().addMessage("myForm:userpswd", 
+					new FacesMessage("Incorrect password!", "Incorrect password!"));
 			return "index";
 		}	    
 	}
 	
 	/**
 	 * This method compares configuration file data with user sign in data and decides if they are valid.
-	 * @return true if data are valid.
+	 * @return true if data are valid and user can be logged in.
 	 */
 	private boolean checkUserRequest(){	
 		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		
 		try(BufferedReader br = new BufferedReader(new InputStreamReader(ec.getResourceAsStream(CONFIG)))){
 			String conf = br.readLine();
 			String params[] = conf.split(" ");		
