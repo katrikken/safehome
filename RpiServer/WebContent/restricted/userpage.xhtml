@@ -18,7 +18,7 @@
 			</div>
 			<h:form>
 		        <table class="form" border="0">        
-		        	<ui:repeat var="i" value="#{userPage.getUsers()}">
+		        	<ui:repeat var="i" value="#{userPage.userBeans}">
 	 					<tr>
 	 						<td><h:outputText value="#{i.name}"/></td>
 	 						<td>
@@ -28,7 +28,7 @@
 	 								onclick="return confirm('Are you sure?')"/>
 	 						</td>
 	 					</tr>
-					</ui:repeat>                      
+					</ui:repeat>      
 		        </table>    
 		        <h:commandButton value="Add new user" action="#{userPage.createUser()}"/> 
 	        </h:form>        

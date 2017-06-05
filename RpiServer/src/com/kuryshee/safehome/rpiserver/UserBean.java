@@ -1,20 +1,44 @@
 package com.kuryshee.safehome.rpiserver;
 
+/**
+ * This class implements user bean for users with registered chip tokens.
+ * @author Ekaterina Kurysheva
+ */
 public class UserBean {
+	
 	private String name;
 	
-	private String key;
+	private String token;
 	
+	/**
+	 * Getter for the property name of a user with registered token.
+	 * @return name of a user.
+	 */
 	public String getName() {
 		return name;
 	}
+	
+	/**
+	 * Setter for the property name.
+	 * @param name of a user with registered token.
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getKey() {
-		return key;
+	
+	/**
+	 * Getter for the property token.
+	 * @return token code.
+	 */
+	public String getToken() {
+		return token;
 	}
-	public void setKey(String key) {
-		this.key = key;
+	
+	/**
+	 * Setter for the property token.
+	 * @param token code.
+	 */
+	public void setToken(String token) {
+		this.token = token;
 	}			
 }

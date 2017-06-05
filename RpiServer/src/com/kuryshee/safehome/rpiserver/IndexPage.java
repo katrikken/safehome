@@ -20,7 +20,7 @@ import javax.faces.context.FacesContext;
 @ManagedBean(name="indexPage")
 @SessionScoped
 public class IndexPage implements Serializable{
-
+	
 	/**
 	 * The attribute contains the path to the file with predefined log in parameters for the administrator user.
 	 */

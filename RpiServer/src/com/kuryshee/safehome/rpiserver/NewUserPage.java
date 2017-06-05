@@ -3,6 +3,7 @@ package com.kuryshee.safehome.rpiserver;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,17 +23,6 @@ import javax.servlet.ServletContext;
 @RequestScoped
 public class NewUserPage implements Serializable{
 	
-	/**
-	 * The constant contains path to the file with registered tokens for a card reader.
-	 */
-	//private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
-	private final String USERCONFIG = "keys.txt";
-	
-	/**
-	 * The constant contains key word for the configuration file {@link #USERCONFIG}.
-	 */
-	private final String KEY = "key ";
-	
 	private String name;
 
 	private String token;
@@ -48,7 +38,7 @@ public class NewUserPage implements Serializable{
 	 * It instructs the logic part to read the token from a card reader.
 	 */
 	public NewUserPage(){
-		RpiServlet.tasks.add(RpiServlet.REQ_READCARD);
+		RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
 	}
 
 	/**
@@ -128,12 +118,14 @@ public class NewUserPage implements Serializable{
 		if(!getToken().isEmpty() && !getName().isEmpty()){
 			Logger.getLogger("NewUserPage").log(Level.INFO, "User can be stored.");
 			
-			try(BufferedWriter bw = new BufferedWriter(new FileWriter(USERCONFIG))){
-				bw.write(KEY + getToken() + "-" + getName() + '\n');
-				RpiServlet.tasks.add(RpiServlet.COMMAND_SAVEUSER);
+			try(PrintWriter out = new PrintWriter(new BufferedWriter(
+					new FileWriter(RpiServlet.USERCONFIG, true)))){
 				
-				return "userpage";
+				out.println(RpiServlet.KEY + getToken() + "-" + getName());
 				
+				RpiServlet.tasks.add(RpiServlet.COMMAND_UPDATEUSERS);
+				
+				return "userpage";		
 			} catch (IOException e) {
 				Logger.getLogger("NewUserPage").log(Level.SEVERE, e.getMessage());
 			} 	
