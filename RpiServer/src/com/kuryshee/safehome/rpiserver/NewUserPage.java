@@ -15,6 +15,8 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
+import com.kuryshee.safehome.sanitizer.Sanitizer;
+
 /**
  * This class implements managed bean for the "newuser" page.
  * @author Ekaterina Kurysheva

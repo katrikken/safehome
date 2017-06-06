@@ -10,8 +10,11 @@ import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+
+import com.kuryshee.safehome.sanitizer.Sanitizer;
 
 /**
  * This class implements a managed bean for the index page of the application.
@@ -34,6 +37,24 @@ public class IndexPage implements Serializable{
 	private String password;
 	
 	private String userName;
+	
+	private UIComponent errorMsgComponent;
+
+	/**
+	 * Getter for the property errorMsgComponent where {@link FacesMessage} is displayed.
+	 * @return the component for error messages.
+	 */
+    public UIComponent getErrorMsgComponent() {
+        return errorMsgComponent;
+    }
+
+    /**
+     * Setter for the property errorMsgComponent.
+     * @param errorMsgComponent is the component to display messages in.
+     */
+    public void setErrorMsgComponent(UIComponent errorMsgComponent) {
+        this.errorMsgComponent = errorMsgComponent;
+    }
 	
 	/**
 	 * Getter for the property userName bounded to the user input.
@@ -88,8 +109,9 @@ public class IndexPage implements Serializable{
 			return "restricted/userpage";
 		}
 		else{
-			FacesContext.getCurrentInstance().addMessage("myForm:userpswd", 
-					new FacesMessage("Incorrect password!", "Incorrect password!"));
+			FacesContext.getCurrentInstance().addMessage(
+					errorMsgComponent.getClientId(), 
+					new FacesMessage("Incorrect password!"));
 			return "index";
 		}	    
 	}
@@ -112,7 +134,6 @@ public class IndexPage implements Serializable{
 		} catch (IOException e) {
 			Logger.getLogger("Page Service").log(Level.SEVERE, e.getMessage());
 		}
-		Logger.getLogger("Page Service").log(Level.INFO, "Login and password are incorrect");
 		return false;
 	}
 }
