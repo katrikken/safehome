@@ -4,11 +4,11 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"> 
 
-	<head>
+	<h:head>
 		<meta charset="utf-8"></meta>
 	    <title>Safe Home</title>
-	    <link rel="stylesheet" type="text/css" href="./style.css"></link>
-	</head> 
+	    <h:outputStylesheet library="css" name="style.css" />
+	</h:head> 
 	<body> 
 		<div class="title">
 	        <h1>Safe Home Application</h1>     
@@ -17,34 +17,31 @@
 			<div class="form">
 		    	<h2>Login to administration panel</h2>
 		        <h:form class="myform">
-		        	<h:panelGroup rendered="#{not indexPage.loggedIn}">	
-		        		<label>Username
-					    	<h:inputText value="#{indexPage.userName}" 
+		        	<label>Username
+					    <h:inputText value="#{indexPage.userName}" 
 					       		required="true" 
 					            requiredMessage="Enter the login!"
 					            id="username"
 					            class="input"/>		
-					        <h:message class="error" 
+					    <h:message class="error" 
 				            	for="username" 
 				            	id="loginError" />		        
-				        </label>
-						<br/>			        
-				        <label>Password
-					        <h:inputSecret value="#{indexPage.password}" 
+				    </label>
+					<br/>			        
+				    <label>Password
+						<h:inputSecret value="#{indexPage.password}" 
 					        	required="true" 
 					            requiredMessage="Enter the password!"
 					            id="userpswd"
 					            class="input"
 					            binding="#{indexPage.errorMsgComponent}"/>	   
-					        <h:message class="error" 
+					    <h:message class="error" 
 				            	for="userpswd" 
 				            	id="pswdError" />   
-				        </label>              	
-				        
-				        <h:commandButton value="Log in" 
+				    </label>              			        
+				    <h:commandButton value="Log in" 
 				            action="#{indexPage.login}"
-				            class="button"/>     
-		            </h:panelGroup>      
+				            class="button"/>          
 		        </h:form>
 			</div>
 		</div>

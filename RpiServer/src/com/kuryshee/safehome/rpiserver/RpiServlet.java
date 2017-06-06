@@ -35,7 +35,7 @@ public class RpiServlet extends HttpServlet {
 	/**
 	 * The POST request parameter for passing the token data.
 	 */
-	private static final String CARD_PARAM = "card";
+	public static final String CARD_PARAM = "card";
 	
 	/**
 	 * The constant for the Raspberry Pi to ask for new tasks from server.

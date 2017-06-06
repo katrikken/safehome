@@ -97,8 +97,6 @@ public class UserPage implements Serializable {
 		try(FileOutputStream fstream = new FileOutputStream(users, false)){
 			userBeans.remove(user);
 			
-			Logger.getLogger("userPage").log(Level.INFO, "User count: " + userBeans.size());
-			
 			fstream.write('\n');
 			
 			for(UserBean bean : userBeans){

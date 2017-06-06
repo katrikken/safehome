@@ -12,6 +12,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
@@ -35,6 +36,8 @@ public class NewUserPage implements Serializable{
 	@ManagedProperty("#{indexPage.userName}")
 	private String userName;
 	
+	private UIComponent errorMsgComponent;
+
 	/**
 	 * This constructor fires a communication chain between this application and logic application on the Raspberry Pi.
 	 * It instructs the logic part to read the token from a card reader.
@@ -42,6 +45,22 @@ public class NewUserPage implements Serializable{
 	public NewUserPage(){
 		RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
 	}
+	
+	/**
+	 * Getter for the property errorMsgComponent where {@link FacesMessage} is displayed.
+	 * @return the component for error messages.
+	 */
+    public UIComponent getErrorMsgComponent() {
+        return errorMsgComponent;
+    }
+
+    /**
+     * Setter for the property errorMsgComponent.
+     * @param errorMsgComponent is the component to display messages in.
+     */
+    public void setErrorMsgComponent(UIComponent errorMsgComponent) {
+        this.errorMsgComponent = errorMsgComponent;
+    }
 
 	/**
 	 * Getter for the property token, which is passed to the bean through the Servlet Context.
@@ -108,10 +127,11 @@ public class NewUserPage implements Serializable{
 			ServletContext servletContext = 
 				(ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
 			
-			String key = servletContext.getAttribute("card").toString();
+			String key = servletContext.getAttribute(RpiServlet.CARD_PARAM).toString();
 			if(!key.equals(RpiServlet.ERROR_ANSWER)){
 				setToken(key);
 			}
+			servletContext.removeAttribute(RpiServlet.CARD_PARAM);
 		}
 		catch(Exception ex){
 			Logger.getLogger("NewUserPage").log(Level.SEVERE, ex.getMessage());
@@ -133,10 +153,9 @@ public class NewUserPage implements Serializable{
 			} 	
 		}
 		else{
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage("You can't save the new user!", new FacesMessage("You can't save the new user!\n"
-					+ "Put your card to the reader and provide a valid name."
-					+ "Check whether the card has not been already registered with another name."));
+			FacesContext.getCurrentInstance().addMessage(
+					errorMsgComponent.getClientId(), 
+					new FacesMessage("Error! Check validity of the name and ensure the token has been read."));
 		}
 		
 		return "newuser";

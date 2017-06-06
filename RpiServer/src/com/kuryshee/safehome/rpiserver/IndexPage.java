@@ -27,7 +27,7 @@ public class IndexPage implements Serializable{
 	/**
 	 * The attribute contains the path to the file with predefined log in parameters for the administrator user.
 	 */
-    private final String CONFIG = "/WEB-INF/config.txt";
+    private final String CONFIG = "/resources/config/config.txt";
 	
     /**
      * Constant attribute for the HTTP session map. 
