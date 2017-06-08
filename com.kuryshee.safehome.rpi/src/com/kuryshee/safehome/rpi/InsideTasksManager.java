@@ -1,52 +1,42 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kuryshee.safehome.rpi;
 
-import static com.kuryshee.safehome.rpi.ComKurysheeSafehomeRpi.log;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * This class interacts with the web camera and motion sensor.
- * sends 
- * REQ_RFIDSWITCH (/rfid?rpi=id&key=user)
- * REQ_MOTIONDETECTED (/motiondetected?rpi=id)
- * REQ_PHOTOTAKEN (/photo?rpi=id)
- * UPLOAD_PHOTO (/upload)
- * reacts to
- * COMMAND_GETSTATE (/getstate?rpi=id&answer=state) 
- * COMMAND_SWITCHON (/switchon?rpi=id&answer=ok)
- * COMMAND_SWITCHOFF (/switchoff?rpi=id&answer=ok)
- * COMMAND_TAKEPHOTO (/photo?rpi=id)
- * COMMAND_READCARD (/read?card=id)
- * @author Katrikken
+ * This class implements managing the inside logic of the application.
+ * @author Ekaterina Kurysheva
  */
 public class InsideTasksManager extends Thread{
-    private long millis = 1000;
-    private final String ATT_ANSWER = "answer";
-    private final String ATT_KEY = "key";
     
+    /**
+     * The constant of one second (in milliseconds).
+     */
+    private long ONE_SEC = 1000;
+    
+    private static final Logger LOGGER = Logger.getLogger("RPi");
+    
+    /**
+     * This method processes the tasks arriving from other logical parts of the application.
+     * @param task specifies the task.
+     */
     private void processTask(String task){
         switch (task){
-            case ComKurysheeSafehomeRpi.COMMAND_GETSTATE: getstateTask();
+            case ServerChecker.COMMAND_GETSTATE: getstateTask();
                 break;         
-            case ComKurysheeSafehomeRpi.COMMAND_SWITCHON: switchOn();
+            case ServerChecker.COMMAND_SWITCHON: switchOn();
                 break;
-            case ComKurysheeSafehomeRpi.COMMAND_SWITCHOFF: switchOff();                
+            case ServerChecker.COMMAND_SWITCHOFF: switchOff();                
                 break;
-            case ComKurysheeSafehomeRpi.COMMAND_TAKEPHOTO: takePhoto();
+            case ServerChecker.COMMAND_TAKEPHOTO: takePhoto();
                 break;
-            case ComKurysheeSafehomeRpi.COMMAND_READCARD: readNewCard();
+            case LocalServerChecker.COMMAND_READTOKEN: readNewCard(task);
                 break;
-            case ComKurysheeSafehomeRpi.COMMAND_SAVEUSER: rereadUserConfiguration();
+            case LocalServerChecker.COMMAND_UPDATEUSERS: rereadUserConfiguration(task);
                 break;
-            default: 
-                if (task.startsWith(ComKurysheeSafehomeRpi.REQ_RFIDSWITCH)){
-                        //The RFID switch command has attribute user preceeded with '=' char.
-                    rfidSwitch(task.substring(ComKurysheeSafehomeRpi.REQ_RFIDSWITCH.length() + 1));
-                }
+            case RFIDController.REQ_RFIDSWITCH : rfidSwitch();
                 break;
         }
     }
@@ -55,107 +45,80 @@ public class InsideTasksManager extends Thread{
      * This method creates program status update request for the server.
      */
     private void getstateTask(){
-        String state = ComKurysheeSafehomeRpi.motionController.getState();    
-        String[] atts = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id, ATT_ANSWER, state};
-        ComKurysheeSafehomeRpi.addQuery(ComKurysheeSafehomeRpi.COMMAND_GETSTATE, atts, ComKurysheeSafehomeRpi.STD_CHARSET);           
+        Map<String, String> atts = new HashMap<>();
+        atts.put(ServerChecker.ATT_RPI, Main.id);
+        atts.put(ServerChecker.ATT_ANSWER, 
+                Main.motionController.getStateString());
+           
+        String query = GetRequestSender.formatQuery(ServerChecker.COMMAND_GETSTATE, atts, Main.DEFAULT_ENCODING);
+        Main.forServer.add(query);        
     }
     
     /**
      * This method sets the current program mode to "ON".
      */
     private void switchOn() {
-        //for the thread debugging purposes
-        if(!ComKurysheeSafehomeRpi.motionController.isON()){       
-            log.log(Level.INFO, "--Inside thread -- switched on");
-        }
-        else{               
-            log.log(Level.INFO, "--Inside thread -- already switched on" ); 
-        }
-        
-        ComKurysheeSafehomeRpi.motionController.setON(true);
-
-        //Sending query string for server that switching on succeded.
-        String[] atts = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id, ATT_ANSWER, ComKurysheeSafehomeRpi.OK_ANSWER};
-        ComKurysheeSafehomeRpi.addQuery(ComKurysheeSafehomeRpi.COMMAND_SWITCHON, atts, ComKurysheeSafehomeRpi.STD_CHARSET);
+        Main.motionController.switchOn();
     }
         
     /**
      * This method sets the current program mode to "OFF".
      */
     private void switchOff(){
-        //for the thread debugging purposes
-        if(ComKurysheeSafehomeRpi.motionController.isON()){        
-            log.log(Level.INFO, "--Inside thread -- returned query ");          
-        }
-        else{
-            log.log(Level.INFO, "--Inside thread -- already switched off");
-        }
-        
-        ComKurysheeSafehomeRpi.motionController.setON(false);
-                
-        //Sending query string indicating that switching off succeded.
-        String[] atts = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id, ATT_ANSWER, ComKurysheeSafehomeRpi.OK_ANSWER};
-        ComKurysheeSafehomeRpi.addQuery(ComKurysheeSafehomeRpi.COMMAND_SWITCHOFF, atts, ComKurysheeSafehomeRpi.STD_CHARSET);
+        Main.motionController.switchOff();
     }
     
     /**
-     * This method invokes function takePhoto() and prepares response to the server.
+     * This method invokes a function on {@link MotionController} instance to take a new photo.
      */
     private void takePhoto(){
-        String path = ComKurysheeSafehomeRpi.motionController.takePhoto();
-            if(path.length() != 0){
-                ComKurysheeSafehomeRpi.photoPaths.add(path);
-                    
-                String[] attsp = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id};
-                ComKurysheeSafehomeRpi.addQuery(ComKurysheeSafehomeRpi.REQ_PHOTOTAKEN, attsp, ComKurysheeSafehomeRpi.STD_CHARSET); 
-            }
-        ComKurysheeSafehomeRpi.forServer.add(ComKurysheeSafehomeRpi.UPLOAD_PHOTO);
-    }
-    
-    private void readNewCard(){
-        switchOff();
-        ComKurysheeSafehomeRpi.forRFID.add(ComKurysheeSafehomeRpi.COMMAND_READCARD);
-    }
-    
-    private void rereadUserConfiguration(){
-        ComKurysheeSafehomeRpi.forRFID.add(ComKurysheeSafehomeRpi.COMMAND_SAVEUSER);
+        Main.motionController.takePhoto();
     }
     
     /**
-     * This method switches the program mode upon the reading of a known RFID tag and sends to the server the updated state.
-     * @param tag 
+     * This method passes the tasks to the {@link MotionController} and {@link RFIDController} to start reading new token.
+     * @param command is a task to pass to the {@link RFIDController}.
      */
-    private void rfidSwitch(String tag){
-        if (ComKurysheeSafehomeRpi.motionController.isON()){
-            switchOff();
+    private void readNewCard(String command){
+        Main.motionController.switchOff();
+        Main.forRFID.add(command);
+    }
+    
+    /**
+     * This method invokes a function on {@link RFIDController} instance to update the information about registered tokens.
+     * @param command is a task to pass to the {@link RFIDController}.
+     */
+    private void rereadUserConfiguration(String command){
+        Main.forRFID.add(command);
+    }
+    
+    /**
+     * This method switches the program mode upon the reading of a known RFID token.
+     */
+    private void rfidSwitch(){
+        if (Main.motionController.isON()){
+            Main.motionController.switchOff();
         }
         else{
-            switchOn();
+            Main.motionController.switchOn();
         }
-           
-        String[] attributes = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id, ATT_KEY, tag};
-        ComKurysheeSafehomeRpi.addQuery(ComKurysheeSafehomeRpi.REQ_RFIDSWITCH, attributes, ComKurysheeSafehomeRpi.STD_CHARSET);
-        
-        getState();
-        log.log(Level.INFO, "--Inside thread -- rfid switch command done.");
     }
     
     /**
-     * The thread repeatedly checks if any task has occurred.
+     * The thread repeatedly checks if any task has arrived.
      */
     @Override
     public void run(){
         while(true){
-            if(!ComKurysheeSafehomeRpi.insideTasks.isEmpty()){
-                log.log(Level.INFO, "--Inside thread -- Got task");
-                processTask(ComKurysheeSafehomeRpi.insideTasks.poll());
+            if(!Main.insideTasks.isEmpty()){
+                LOGGER.log(Level.INFO, "--Inside thread -- Got task");
+                processTask(Main.insideTasks.poll());
             }
 
-            try { Thread.sleep(millis); }
+            try { Thread.sleep(ONE_SEC); }
             catch(InterruptedException e){
-                log.log(Level.SEVERE, "--Inside thread -- Interrupted");
+                LOGGER.log(Level.SEVERE, "--Inside thread -- Interrupted");
             }
         }
     }
-
 }

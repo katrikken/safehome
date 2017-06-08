@@ -1,131 +1,195 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kuryshee.safehome.rpi;
 
-import static com.kuryshee.safehome.rpi.ComKurysheeSafehomeRpi.log;
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * This class interacts with the main server.
+ * This class implements the custom thread.
+ * It communicates with the main server and passes the answers to the other parts of the application.
+ * @author Ekaterina Kurysheva
  */
 public class ServerChecker extends Thread{ 
     
-    private final String REQ_CHECKTASK = "/checktask";  
-    private long millis = 100;
+    /**
+     * The constant for GET request to check up with the main server.
+     */
+    public final String REQ_CHECKTASK = "/checktask";  
     
     /**
-    * This method uses utility class GetRequestSender to send GET 
-    * @param request to the server.
-    */
-    private void sendGETRequest(String request){      
-        GetRequestSender sender = null;
-        try{
-            sender = new GetRequestSender(ComKurysheeSafehomeRpi.serverAddress + request, ComKurysheeSafehomeRpi.STD_CHARSET);
-            log.log(Level.INFO, "--Server thread -- send request {0}", ComKurysheeSafehomeRpi.serverAddress + request);  
-            String answer = sender.connect();
-            if(!answer.equals(ComKurysheeSafehomeRpi.NO_ANSWER) && !answer.equals(ComKurysheeSafehomeRpi.ERROR_ANSWER)){
-                ComKurysheeSafehomeRpi.insideTasks.add(answer);
-                        
-                log.log(Level.INFO, "--Server thread -- got inside task: {0}", answer);  
+     * The constant for commanding and reporting switching the program state to off.
+     */
+    public static final String COMMAND_SWITCHOFF = "/switchoff";
+    
+    /**
+     * The constant for commanding and reporting switching the program state to on.
+     */
+    public static final String COMMAND_SWITCHON = "/switchon";
+    
+    /**
+     * The constant for reporting switching the program state to by the token.
+     */
+    public static final String REQ_RFIDSWITCH = "/rfid";
+    
+    /**
+     * The constant for the server to ask for the program state.
+     */
+    public static final String COMMAND_GETSTATE = "/getstate";
+    
+    /**
+     * The constant for the server to command taking a photo.
+     */
+    public static final String COMMAND_TAKEPHOTO = "/takephoto";
+    
+    /**
+     * The constant for the POST request to the server when sending a photo.
+     */
+    public static final String UPLOAD_PHOTO = "/upload"; 
+    
+    /**
+     * The constant for the POST request parameter of time.
+     */
+    public static final String TIME_PARAM = "time";
+    
+    /**
+     * The constant for the POST request parameter of this Raspberry Pi ID.
+     */
+    public static final String ID_PARAM = "rpi";
+    
+    /**
+     * The constant for the POST request parameter of photo.
+     */
+    public static final String PHOTO_PARAM = "photo";
+    
+    /**
+     * The constant for the POST request parameter containing the name associated with used RFID token.
+     */
+    public static final String RFID_PARAM = "rfid";
+    
+    /**
+     * The constant for the GET request parameter of this Raspberry Pi ID.
+     */
+    public static final String ATT_RPI = "rpi";
+    
+    /**
+     * The constant for the GET request parameter containing short answer.
+     */
+    public static final String ATT_ANSWER = "answer";
+    
+    private long ONE_SEC = 1000;
+    
+    private static final Logger LOGGER = Logger.getLogger("Server Check");
+    
+
+    /**
+     * This method uploads photos to the server.
+     */
+    private void uploadPhoto(){
+        for(int i = 0; i < Main.photoPaths.size(); i++){
+            FileUploader uploader;
+            try{
+                uploader = new FileUploader(Main.serverAddress + UPLOAD_PHOTO, Main.DEFAULT_ENCODING);
+                uploader.addFormField(TIME_PARAM, 
+                        Main.photoPaths.peek().substring(
+                                Main.photoDir.length(), Main.photoPaths.peek().length() - Main.formatOfImage.length())
+                );
+                uploader.addFormField(ID_PARAM, Main.id);
+
+                uploader.addFilePart(PHOTO_PARAM, new File(Main.photoPaths.peek()));
+                String response = uploader.finish();
+                if(response.equals(Main.OK_ANSWER)){
+                    LOGGER.log(Level.INFO, "Photo {0} was successfully sent.", Main.photoPaths.peek());
+                    
+                    Main.photoPaths.poll();                
+                }       
+                else{
+                    LOGGER.log(Level.INFO, "Photo has not been sent. Server response: {0}", response);
+                }
             }
-        }
-        catch(IOException e){ 
-            log.log(Level.SEVERE, "--Server thread -- sending GET request failed"); 
-        }
-        finally{
-            if (sender != null){
-                sender.finish();
-            }
+            catch(Exception e){
+                LOGGER.log(Level.SEVERE, "--Server thread -- sending POST request failed", e); 
+            }        
         }
     }
     
-    /**
-     * This method uses utility class FileUploader to send POST request to the server.
-     */
-    private void sendPOSTRequest(){
+    private void sendSwitchInfo(String info){
         FileUploader uploader;
         try{
-            uploader = new FileUploader(ComKurysheeSafehomeRpi.serverAddress + ComKurysheeSafehomeRpi.UPLOAD_PHOTO, ComKurysheeSafehomeRpi.STD_CHARSET);
-            uploader.addFormField("time", 
-                    ComKurysheeSafehomeRpi.photoPaths.peek().substring(
-                            ComKurysheeSafehomeRpi.photoDir.length(), ComKurysheeSafehomeRpi.photoPaths.peek().length() - ComKurysheeSafehomeRpi.formatOfImage.length())
-            );
-            uploader.addFormField("rpi", ComKurysheeSafehomeRpi.id);
-            
-            uploader.addFilePart("photo", new File(ComKurysheeSafehomeRpi.photoPaths.peek()));
+            uploader = new FileUploader(Main.serverAddress + RFIDController.REQ_RFIDSWITCH,
+                    Main.DEFAULT_ENCODING);
+
+            uploader.addFormField(ID_PARAM, Main.id);
+            uploader.addFormField(RFID_PARAM, info);
+                
             String response = uploader.finish();
-            if(response.equals(ComKurysheeSafehomeRpi.OK_ANSWER)){
-                ComKurysheeSafehomeRpi.photoPaths.poll();
-                log.log(Level.INFO, "Photo successfully sent.");
+            if(response.equals(Main.OK_ANSWER)){
+                LOGGER.log(Level.INFO, "Switching by the token was logged on the server");              
             }       
             else{
-                log.log(Level.INFO, "Photo has not been sent. Server response: " + response);
+                LOGGER.log(Level.INFO, "Switching be the token was not logged on the server");
             }
         }
-        catch(IOException e){
-            log.log(Level.SEVERE, "--Server thread -- sending POST request failed", e); 
+        catch(Exception e){
+            LOGGER.log(Level.SEVERE, "--Server thread -- sending POST request failed", e); 
         }           
     }
     
     /**
-     * This method repeatedly checks for the requests to send to the main server, 
-     * sends GET and POST HTTP requests and processes the responses.
+     * This method sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
+     */
+    private void sendCheckTask(){
+        String query;
+        try {
+            query = String.format("%s?%s=%s", 
+                    REQ_CHECKTASK,
+                    ATT_RPI,
+                    URLEncoder.encode(Main.id, Main.DEFAULT_ENCODING));
+            
+            Main.sendGETRequest(Main.serverAddress, query);
+            
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.log(Level.SEVERE, "--Sending checktask request failed", ex);
+        }                      
+    }
+    
+    /**
+     * This method repeatedly checks for the requests to send to the main server. 
      */
     @Override
     public void run(){
         while(true){ 
-            System.out.println("--Server thread -- check for tasks");
-            if(ComKurysheeSafehomeRpi.forServer.isEmpty()){  
-                try{
-                    String query = String.format("%s?%s=%s", 
-                        REQ_CHECKTASK, 
-                        ComKurysheeSafehomeRpi.ATT_RPI,
-                        URLEncoder.encode(ComKurysheeSafehomeRpi.id, ComKurysheeSafehomeRpi.STD_CHARSET));
-                        
-                    sendGETRequest(query);
-                }
-                catch(UnsupportedEncodingException e){ 
-                    System.out.println("--Server thread -- sending checktask failed ");
-                }   
+            if(Main.forServer.isEmpty()){  
+                sendCheckTask();
             }
             else{
-                System.out.println("--Server thread -- got task from inside ");
+                LOGGER.log(Level.INFO, "--Got a task");
                     
                 //Parsing query for server to distinguish between GET and POST requests.
-                int index = ComKurysheeSafehomeRpi.forServer.peek().indexOf("?");
-                String command = ComKurysheeSafehomeRpi.forServer.peek().substring(0, index);
-                
-                //Answers for server tasks
+                int index = Main.forServer.peek().indexOf("?");
+                String command = Main.forServer.peek().substring(0, index);
+
                 switch (command) {
-                    case ComKurysheeSafehomeRpi.COMMAND_GETSTATE:
-                    case ComKurysheeSafehomeRpi.COMMAND_SWITCHOFF:
-                    case ComKurysheeSafehomeRpi.COMMAND_SWITCHON:
-                    case ComKurysheeSafehomeRpi.COMMAND_TAKEPHOTO:
-                        sendGETRequest(ComKurysheeSafehomeRpi.forServer.poll());
+                    case COMMAND_GETSTATE:
+                    case COMMAND_SWITCHOFF:
+                    case COMMAND_SWITCHON:
+                    case COMMAND_TAKEPHOTO:
+                    case MotionController.REQ_MOTIONDETECTED:
+                        Main.sendGETRequest(Main.serverAddress, Main.forServer.poll());
                         break;
-                    case ComKurysheeSafehomeRpi.REQ_RFIDSWITCH:
-                    case ComKurysheeSafehomeRpi.REQ_MOTIONDETECTED:
-                    case ComKurysheeSafehomeRpi.REQ_PHOTOTAKEN:
-                        sendGETRequest(ComKurysheeSafehomeRpi.forServer.poll());
-                        break;
-                    case ComKurysheeSafehomeRpi.UPLOAD_PHOTO:
-                        //Try to send all photoes which are made from the last synchronization.
-                        for(int i = 0; i< ComKurysheeSafehomeRpi.photoPaths.size(); i++ ){
-                            sendPOSTRequest();
-                        }   
+                    case MotionController.REQ_PHOTOTAKEN:
+                        Main.sendGETRequest(Main.serverAddress, Main.forServer.poll());
+                        uploadPhoto();
                         break;
                     default:
+                        if(command.startsWith(RFIDController.REQ_RFIDSWITCH)){
+                            sendSwitchInfo(command.substring(RFIDController.REQ_RFIDSWITCH.length()));
+                        }
                         break;
                 }
             }
-            try{ Thread.sleep(millis); }
+            try{ Thread.sleep(ONE_SEC); }
             catch(InterruptedException e){ System.out.println("--Server thread -- Interrupted"); }
         }
     }

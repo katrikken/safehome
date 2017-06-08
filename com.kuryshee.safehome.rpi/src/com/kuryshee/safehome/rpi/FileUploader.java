@@ -118,16 +118,16 @@ public class FileUploader {
                     try{ Thread.sleep(200); }
                     catch(InterruptedException e){ 
                         Logger.getLogger("File Uploader").log(Level.SEVERE, "Failed to get response to the POST request", e);
-                        return ComKurysheeSafehomeRpi.ERROR_ANSWER;
+                        return Main.ERROR_ANSWER;
                     }               
                 }
             }
-            return ComKurysheeSafehomeRpi.NO_ANSWER;
+            return Main.NO_ANSWER;
                        
         }
-        catch(IOException e){
+        catch(Exception e){
             Logger.getLogger("File Uploader").log(Level.SEVERE, "Failed to send POST request", e);
-            return ComKurysheeSafehomeRpi.ERROR_ANSWER;
+            return Main.ERROR_ANSWER;
         }
     }
 }

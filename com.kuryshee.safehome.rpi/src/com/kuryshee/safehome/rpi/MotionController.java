@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kuryshee.safehome.rpi;
 
-import static com.kuryshee.safehome.rpi.ComKurysheeSafehomeRpi.log;
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioInterrupt;
 import com.pi4j.wiringpi.GpioInterruptEvent;
@@ -14,22 +8,54 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class interacts with the web camera and motion sensor.
+ * @author Ekaterina Kurysheva
  */
 public class MotionController{
-    private final int PIR_IN = 11; //GPIO 11 pin number for motion sensor output
-    private DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");     
-    private final String REQ_MOTIONDETECTED = "/motiondetected";
+    
+    /**
+     * GPIO pin number for motion sensor output.
+     */
+    private final int PIR_IN = 11;
+    
+    /**
+     * The date format which is used to capture the time when the photo is taken.
+     */
+    private DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");   
+    
+    /**
+     * The constant which is added to the address of a server when reporting motion detection.  
+     */
+    public static final String REQ_MOTIONDETECTED = "/motiondetected";
+    
+    /**
+     * The constant which is added to the address of a server when reporting the taking of a new photo.  
+     */
+    public static final String REQ_PHOTOTAKEN = "/photo";  
+    
     private boolean ON = false;
+    
+    private static final Logger LOGGER = Logger.getLogger("Motion Controller");
 
+    /**
+     * Getter for the property ON.
+     * @return true if the state of the program is "ON".
+     */
     public boolean isON() {
         return ON;
     }
 
-    public void setON(boolean ON) {
+    /**
+     * Setter for the Boolean property ON, which indicates the state of the program. 
+     * @param ON is true in case the state should be "ON".
+     */
+    private void setON(boolean ON) {
         this.ON = ON;
     }
      
@@ -41,7 +67,11 @@ public class MotionController{
         setPin();
     }
     
-    public String getState(){
+    /**
+     * This method returns the string specifying the state of the program.
+     * @return "on" or "off".
+     */
+    public String getStateString(){
         if (isON()){
             return "on";
         }
@@ -53,23 +83,16 @@ public class MotionController{
     /**
      * This method sets listener to the Motion Sensor output pin without creation of new GPIO Controller instance. 
      * The listener reacts to the event in case the state of the MotionController instance is set to "ON".
+     * The listener reports to the server about actions.
      */
     private void setPin(){
         GpioInterrupt.addListener((GpioInterruptEvent event) -> {
             if(isON() && event.getState()){
-                log.log(Level.INFO, " --> GPIO trigger callback received");
+                LOGGER.log(Level.INFO, " --> GPIO triggered");
       
-                //Sending query string for server indicating that motion has been detected.
-                String[] atts = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id};
-                ComKurysheeSafehomeRpi.addQuery(REQ_MOTIONDETECTED, atts, ComKurysheeSafehomeRpi.STD_CHARSET);  
-                
-                String path = takePhoto();
-                if(path.length() != 0){
-                    ComKurysheeSafehomeRpi.photoPaths.add(path);
-                    
-                    String[] attsp = {ComKurysheeSafehomeRpi.ATT_RPI, ComKurysheeSafehomeRpi.id};
-                    ComKurysheeSafehomeRpi.addQuery(ComKurysheeSafehomeRpi.REQ_PHOTOTAKEN, attsp, ComKurysheeSafehomeRpi.STD_CHARSET); 
-                }
+                report(REQ_MOTIONDETECTED);
+
+                takePhoto();         
             }
         });
 
@@ -79,28 +102,58 @@ public class MotionController{
         Gpio.pullUpDnControl(PIR_IN, Gpio.PUD_DOWN);
         GpioInterrupt.enablePinStateChangeCallback(PIR_IN);       
             
-        log.log(Level.INFO, "--Inside thread -- PIN is set");
+        LOGGER.log(Level.INFO, "--Inside thread -- PIN is set");
     }
     
     
     /**
      * This method takes a photo and saves it into the directory set in the configuration file.
-     * @return String photo directory.
+     * It reports the path to the photo to the {@link Main#photoPaths}.
      */
-    public String takePhoto(){
+    public void takePhoto(){
         try{
             String command = "fswebcam ";
 
             String date = dateFormat.format(new Date());
-            String path = ComKurysheeSafehomeRpi.photoDir + date + ComKurysheeSafehomeRpi.formatOfImage;
+            String path = Main.photoDir + date + Main.formatOfImage;
             Process p = Runtime.getRuntime().exec(command + path);
                 
-            log.log(Level.INFO, "--Inside thread - took photo at: {0}", path);
-            return path;
+            LOGGER.log(Level.INFO, "--Inside thread - took photo at: {0}", path);
+
+            Main.photoPaths.add(path);
+            report(REQ_PHOTOTAKEN);
         }
         catch(IOException e){
-            log.log(Level.WARNING, "--Inside thread - could not take a photo");
-            return "";
+            LOGGER.log(Level.WARNING, "--Inside thread - could not take a photo");
         }
+    }
+    
+    /**
+     * This method sets the current program mode to "OFF" and reports it to the server.
+     */
+    public void switchOff(){       
+        setON(false);
+        report(ServerChecker.COMMAND_SWITCHOFF);
+    }
+    
+    /**
+     * This method sets the current program mode to "ON" and reports it to the server.
+     */
+    public void switchOn(){
+        setON(true);
+        report(ServerChecker.COMMAND_SWITCHON);
+    }
+    
+    /**
+     * This method creates a query string to specify the state of the application and passes it to the {@link Main#forServer}.
+     * @param command specifies the command upon which the state has been changed.
+     * @param atts is a map of attributes for the query. In case it is null, the default attribute with this Raspberry Pi id is added.
+     */
+    private void report(String command){
+        Map<String, String> atts = new HashMap<>();
+        atts.put(ServerChecker.ATT_RPI, Main.id);
+           
+        String query = GetRequestSender.formatQuery(command, atts, Main.DEFAULT_ENCODING);
+        Main.forServer.add(query);
     }
 }

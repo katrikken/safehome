@@ -4,8 +4,13 @@ package com.kuryshee.safehome.rpi;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GetRequestSender {
 
@@ -39,15 +44,15 @@ public class GetRequestSender {
                 else{            
                     try{ Thread.sleep(100); }
                     catch(InterruptedException e){ //log 
-                        return ComKurysheeSafehomeRpi.ERROR_ANSWER;
+                        return Main.ERROR_ANSWER;
                     }               
                 }
             }
-            return ComKurysheeSafehomeRpi.NO_ANSWER;
+            return Main.NO_ANSWER;
                        
         }
         catch(IOException e){
-            return ComKurysheeSafehomeRpi.ERROR_ANSWER;
+            return Main.ERROR_ANSWER;
         }
     }   
     
@@ -55,5 +60,37 @@ public class GetRequestSender {
         if (connection != null){
             connection.disconnect();
         }
+    }
+    
+    /**
+     * This method encodes the query to the URL format.
+     * @param command is a start of the query address
+     * @param attributes is a map of parameter names and values of the query
+     * @param charset is an encoding setting for the query
+     * @return string with encoded query.
+     */
+    public static String formatQuery(String command, Map<String, String> attributes, String charset){
+        try{
+            StringBuilder query = new StringBuilder(command + '?');
+            
+            int size = attributes.size();
+            
+            for(String key : attributes.keySet()){
+                query.append(key);
+                query.append('=');
+                query.append(URLEncoder.encode(attributes.get(key), charset));
+                
+                size--;
+                if(size > 0){
+                    query.append('&');
+                }
+            }
+               
+            return query.toString();
+        }
+        catch(UnsupportedEncodingException e){
+            Logger.getLogger("Query encoding").log(Level.SEVERE, "--Main thread -- could not form the query string");          
+        }
+        return "";
     }
 }

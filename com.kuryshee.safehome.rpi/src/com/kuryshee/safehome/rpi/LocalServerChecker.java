@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kuryshee.safehome.rpi;
 
-import static com.kuryshee.safehome.rpi.ComKurysheeSafehomeRpi.log;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -13,55 +7,65 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Katrikken
+ * This class implements the custom thread.
+ * It communicates with the local server and passes the answers to the other parts of the application.
+ * @author Ekaterina Kurysheva
  */
 public class LocalServerChecker extends Thread{ 
-    private final String REQ_CHECKTASK = "/checktask";  
-    private long millis = 1000;
     
     /**
-    * This method uses utility class GetRequestSender to send GET 
-    * @param request to the server.
-    * It stores the answer in the queue for inside tasks.
-    */
-    private void sendGETRequest(String request){      
-        GetRequestSender sender = null;
-        try{
-            sender = new GetRequestSender(ComKurysheeSafehomeRpi.localServerAddress  + request, 
-                    ComKurysheeSafehomeRpi.STD_CHARSET);
-            log.log(Level.INFO, "--Local server thread -- send request {0}", ComKurysheeSafehomeRpi.localServerAddress + request); 
-            
-            String answer = sender.connect();
-            if(!answer.equals(ComKurysheeSafehomeRpi.NO_ANSWER) && !answer.equals(ComKurysheeSafehomeRpi.ERROR_ANSWER)){
-                ComKurysheeSafehomeRpi.insideTasks.add(answer);
-                        
-                log.log(Level.INFO, "--Local server thread -- got inside task: {0}", answer);  
-            }
-        }
-        catch(IOException e){ 
-            log.log(Level.SEVERE, "--Local server thread-- sending GET request failed"); 
-        }
-        finally{
-            if (sender != null){
-                sender.finish();
-            }
-        }
-    }
+     * The constant for the Raspberry Pi to ask for new tasks from server.
+     */
+    public static final String REQ_CHECKTASK = "/checktask";
+	
+    /**
+     * The constant for the server to tell the Raspberry Pi to read a token.
+     */
+    public static final String COMMAND_READTOKEN = "/read";
     
+    /**
+     * The constant for the server to tell the Raspberry Pi to update user list.
+     */
+    public static final String COMMAND_UPDATEUSERS = "/saveuser";
+
+    /**
+     * The POST request parameter for passing the token data.
+     */
+    public static final String CARD_PARAM = "card";
+    
+    /**
+     * The POST request parameter for passing the id data.
+     */
+    public static final String ID_PARAM = "rpi";
+    
+    /**
+     * The constant for the GET request parameter of this Raspberry Pi ID.
+     */
+    public static final String ATT_RPI = "rpi";
+    
+    /**
+     * The constant defining how long the thread should sleep in between actions in milliseconds.
+     */
+    private long FIVE_SEC = 5000;
+    
+    private static final Logger LOGGER = Logger.getLogger("Local server checker");
+    
+    /**
+     * This method sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
+     */
     private void sendCheckTask(){
         String query;
         try {
             query = String.format("%s?%s=%s", 
                     REQ_CHECKTASK,
-                    ComKurysheeSafehomeRpi.ATT_RPI,
-                    URLEncoder.encode(ComKurysheeSafehomeRpi.id, ComKurysheeSafehomeRpi.STD_CHARSET));
+                    ATT_RPI,
+                    URLEncoder.encode(Main.id, Main.DEFAULT_ENCODING));
             
-            sendGETRequest(query);
+            Main.sendGETRequest(Main.localServerAddress, query);
+            
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(LocalServerChecker.class.getName()).log(Level.SEVERE, null, ex);
-        }
-                             
+            LOGGER.log(Level.SEVERE, null, ex);
+        }                      
     }
     
     /**
@@ -70,36 +74,40 @@ public class LocalServerChecker extends Thread{
     private void sendCardID(){
         FileUploader uploader;
         try{
-            uploader = new FileUploader(ComKurysheeSafehomeRpi.localServerAddress + ComKurysheeSafehomeRpi.COMMAND_READCARD, 
-                    ComKurysheeSafehomeRpi.STD_CHARSET);
+            uploader = new FileUploader(Main.localServerAddress + COMMAND_READTOKEN, 
+                    Main.DEFAULT_ENCODING);
             
-            uploader.addFormField("rpi", ComKurysheeSafehomeRpi.id);            
-            uploader.addFormField("card", ComKurysheeSafehomeRpi.forLocalServer.peek());
+            uploader.addFormField(ID_PARAM, Main.id);            
+            uploader.addFormField(CARD_PARAM, Main.forLocalServer.peek().substring(COMMAND_READTOKEN.length()));
             String response = uploader.finish();
-            if(response.equals(ComKurysheeSafehomeRpi.OK_ANSWER)){
-                ComKurysheeSafehomeRpi.forLocalServer.poll();
+            
+            if(response.equals(Main.OK_ANSWER)){
+                Main.forLocalServer.poll();
             }         
         }
         catch(IOException e){
-            log.log(Level.INFO, "-- Local server thread -- sending POST request failed"); 
+            LOGGER.log(Level.INFO, "-- Local server thread -- sending POST request failed"); 
         }           
     }
     
+    /**
+     * This method contains the infinite loop in which it tries to get the task from the server.
+     */
     @Override
     public void run(){
         while(true){ 
-            Logger.getLogger(LocalServerChecker.class.getName()).log(Level.INFO, "--Local server thread -- check for tasks");
-            if(ComKurysheeSafehomeRpi.forLocalServer.isEmpty()){  
+            LOGGER.log(Level.INFO, "--Local server thread -- check for tasks");
+            if(Main.forLocalServer.isEmpty()){  
                 sendCheckTask();            
             }
-            else{
-                Logger.getLogger(LocalServerChecker.class.getName()).log(Level.INFO, "--Local server thread -- got card ID to send ");
-                if (ComKurysheeSafehomeRpi.forLocalServer.peek().equals(ComKurysheeSafehomeRpi.COMMAND_READCARD)){
+            else{        
+                if (Main.forLocalServer.peek().startsWith(COMMAND_READTOKEN)){
+                    LOGGER.log(Level.INFO, "--Local server thread -- got card ID to send ");
                     sendCardID();
                 }
             }
-            try{ Thread.sleep(millis); }
-            catch(InterruptedException e){ Logger.getLogger(LocalServerChecker.class.getName()).log(Level.SEVERE, null, e); }
+            try{ Thread.sleep(FIVE_SEC); }
+            catch(InterruptedException e){ LOGGER.log(Level.SEVERE, null, e); }
         }
     }
 }
