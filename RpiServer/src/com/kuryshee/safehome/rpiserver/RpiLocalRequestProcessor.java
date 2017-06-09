@@ -30,7 +30,7 @@ public class RpiLocalRequestProcessor implements RequestProcessor{
 	 */
 	private String checktask(){
 		if (!RpiServlet.tasks.isEmpty()){	
-			log.info("--Local server has task for rpi");
+			log.info("-- Local server has task for rpi " + RpiServlet.tasks.peek());
 				
 			return RpiServlet.tasks.poll();
 		}		

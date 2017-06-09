@@ -111,7 +111,7 @@ public class IndexPage implements Serializable{
 		else{
 			FacesContext.getCurrentInstance().addMessage(
 					errorMsgComponent.getClientId(), 
-					new FacesMessage("Incorrect password!"));
+					new FacesMessage("Incorrect login and password!"));
 			return "index";
 		}	    
 	}

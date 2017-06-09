@@ -37,14 +37,6 @@ public class NewUserPage implements Serializable{
 	private String userName;
 	
 	private UIComponent errorMsgComponent;
-
-	/**
-	 * This constructor fires a communication chain between this application and logic application on the Raspberry Pi.
-	 * It instructs the logic part to read the token from a card reader.
-	 */
-	public NewUserPage(){
-		RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
-	}
 	
 	/**
 	 * Getter for the property errorMsgComponent where {@link FacesMessage} is displayed.
@@ -156,6 +148,9 @@ public class NewUserPage implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(
 					errorMsgComponent.getClientId(), 
 					new FacesMessage("Error! Check validity of the name and ensure the token has been read."));
+			if(!RpiServlet.tasks.contains(RpiServlet.COMMAND_READTOKEN)){
+				RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
+			}
 		}
 		
 		return "newuser";

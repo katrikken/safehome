@@ -114,9 +114,11 @@ public class UserPage implements Serializable {
 	
 	/**
 	 * This method redirects to a page, where new user can be registered.
+	 * It signalizes to the servlet about upcoming task of fetching data from the logic part.
 	 * @return newuser page
 	 */
 	public String createUser(){
+		RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
 		return "newuser";
 	}
 }

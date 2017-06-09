@@ -71,8 +71,8 @@ public class RpiServlet extends HttpServlet {
 	/**
 	 * The constant contains path to the file with registered tokens for a card reader.
 	 */
-	//private String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/keys.txt";
-	public static final String USERCONFIG = "keys.txt";
+	public static final String USERCONFIG = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/keys.txt";
+	//public static final String USERCONFIG = "keys.txt";
 	
 	/**
 	 * The constant contains key word for the configuration file {@link #USERCONFIG}.
