@@ -16,6 +16,7 @@ public class GetRequestSender {
 
     private HttpURLConnection connection;
     private String charset;
+    private int TEN_SEC = 10000;
     
     /**
      * This constructor creates a new instance of HttpURLConnection to form a GET request.
@@ -29,7 +30,8 @@ public class GetRequestSender {
         connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setDoInput(true);
-        connection.setRequestProperty("Accept-Charset", charset);                                      
+        connection.setRequestProperty("Accept-Charset", charset);                
+        connection.setConnectTimeout(TEN_SEC); 
     }
     
     public String connect() throws IOException{
@@ -38,8 +40,9 @@ public class GetRequestSender {
                     new InputStreamReader(connection.getInputStream(), charset))){     
             for (int i = 0; i < 10; i++){  
                 if(reader != null){
-                    String answer = reader.readLine().trim();
-                    return answer;
+                    String answer = reader.readLine();
+                    if(answer != null)
+                        return answer;
                 }
                 else{            
                     try{ Thread.sleep(100); }
@@ -48,8 +51,8 @@ public class GetRequestSender {
                     }               
                 }
             }
-            return Main.NO_ANSWER;
-                       
+            
+            return Main.NO_ANSWER;                      
         }
         catch(IOException e){
             return Main.ERROR_ANSWER;

@@ -55,35 +55,6 @@ public class Main {
     private static final Logger LOGGER = Logger.getLogger("RPi");
     
     /**
-    * This method uses utility class {@link GetRequestSender} to send GET request
-    * @param server is a server address
-    * @param request is a string to add to the server address.
-    * The method stores the answer in the queue for inside tasks in {@link #insideTasks}.
-    */
-    public static void sendGETRequest(String server, String request){      
-        GetRequestSender sender = null;
-        try{
-            sender = new GetRequestSender(server  + request, DEFAULT_ENCODING);
-            LOGGER.log(Level.INFO, "-- Send request " + request + " to " + server); 
-            
-            String answer = sender.connect();
-            if(!answer.equals(NO_ANSWER) && !answer.equals(ERROR_ANSWER)){
-                insideTasks.add(answer);
-                        
-                LOGGER.log(Level.INFO, "--Got inside task: {0}", answer);  
-            }
-        }
-        catch(IOException e){ 
-            LOGGER.log(Level.SEVERE, "--Sending GET request to " + server + "failed"); 
-        }
-        finally{
-            if (sender != null){
-                sender.finish();
-            }
-        }
-    }
-    
-    /**
      * This method reads the program configuration file and sets variables {@link #serverAddress},  
      * {@link #localServerAddress}, {@link #id}, {@link #photoDir}.
      */
@@ -134,30 +105,31 @@ public class Main {
         }
     }
     
-    public static void main(String[] args) {
-        
+    /**
+     * This method is an entry point of a program.
+     * It initializes and starts working threads.
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {     
         readConfigurations();
         createTokenConfig();
-            
-            //Debugging 
-            //rfidKeys.put("36D9C53B11", "chip");
-            //rfidKeys.put("C4703ED55F", "card");
-            
-            //Starting threads.
+
         RFIDController rfidThread = new RFIDController();  
         motionController= new MotionController();
+        InsideTasksManager manager = new InsideTasksManager();
         ServerChecker requestThread = new ServerChecker();
         LocalServerChecker localChecker = new LocalServerChecker();
-
-        LOGGER.log(Level.INFO, "--Starting thread for server");
-        requestThread.start();
-            
+       
         LOGGER.log(Level.INFO, "--Starting thread for rfid");
         rfidThread.start();
+        
+        LOGGER.log(Level.INFO, "--Starting thread for inside tasks manager");
+        manager.start();
             
+        LOGGER.log(Level.INFO, "--Starting thread for server");
+        requestThread.start();
+       
         LOGGER.log(Level.INFO, "--Starting thread for local server");
         localChecker.start();     
-    }
-    
-    
+    }    
 }

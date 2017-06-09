@@ -104,10 +104,8 @@ public class RFIDController extends Thread{
         
         long t = System.currentTimeMillis();
         long end = t + 60000;
-        while(System.currentTimeMillis() < end) {
-            if (!(token = readCard()).equals(ZEROTAG)){
-                break;
-            }
+        while(System.currentTimeMillis() < end && token.equals(ZEROTAG)) {
+            token = readCard();
         }
         
         if(!token.equals(ZEROTAG)){
@@ -126,12 +124,11 @@ public class RFIDController extends Thread{
     /**
      * This method processes tasks coming to the {@link Main#forRFID} from other parts of the application.
      */
-    private void processTask(){
-        
-        if(Main.forRFID.peek().equals(LocalServerChecker.COMMAND_READTOKEN)){
+    private void processTask(String task){     
+        if(task.equals(LocalServerChecker.COMMAND_READTOKEN)){
             waitForNewToken();
         }
-        else if(Main.forRFID.peek().equals(LocalServerChecker.COMMAND_UPDATEUSERS)){
+        else if(task.equals(LocalServerChecker.COMMAND_UPDATEUSERS)){
             rfidKeys.clear();
             readKnownTags();
         }
@@ -159,7 +156,7 @@ public class RFIDController extends Thread{
                 }
             }
             else{
-                processTask();
+                processTask(Main.forRFID.poll());
             }           
             
             try { Thread.sleep(TWO_SEC); } 

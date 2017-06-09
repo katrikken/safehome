@@ -61,7 +61,7 @@ public class LocalServerChecker extends Thread{
                     ATT_RPI,
                     URLEncoder.encode(Main.id, Main.DEFAULT_ENCODING));
             
-            Main.sendGETRequest(Main.localServerAddress, query);
+            sendGETRequest(query);
             
         } catch (UnsupportedEncodingException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -88,6 +88,39 @@ public class LocalServerChecker extends Thread{
         catch(IOException e){
             LOGGER.log(Level.INFO, "-- Local server thread -- sending POST request failed"); 
         }           
+    }
+    
+    /**
+    * This method uses utility class {@link GetRequestSender} to send GET request
+    * @param request is a string to add to the server address.
+    * The method stores the answer in the queue for inside tasks in {@link #insideTasks}.
+    * @return true if the request was successfully sent.
+    */
+    public static Boolean sendGETRequest(String request){      
+        GetRequestSender sender = null;
+        try{
+            sender = new GetRequestSender(Main.localServerAddress + request, Main.DEFAULT_ENCODING);
+            LOGGER.log(Level.INFO, "-- Send request " + request + " to " + Main.localServerAddress); 
+            
+            String answer = sender.connect();
+
+            LOGGER.log(Level.INFO, "-- Answer: ", answer); 
+            if(!answer.equals(Main.NO_ANSWER) && !answer.equals(Main.ERROR_ANSWER)){
+                Main.insideTasks.add(answer);
+                        
+                LOGGER.log(Level.INFO, "-- Got inside task: {0}", answer);  
+            }
+            return true;
+        }
+        catch(Exception e){ 
+            LOGGER.log(Level.SEVERE, "-- Sending GET request to {0} failed", Main.localServerAddress); 
+        }
+        finally{
+            if (sender != null){
+                sender.finish();
+            }
+        }
+        return false;
     }
     
     /**

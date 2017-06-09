@@ -114,7 +114,12 @@ public class ServerChecker extends Thread{
         }
     }
     
-    private void sendSwitchInfo(String info){
+    /**
+     * This method uploads information about switching the state of a program by a token.
+     * @param info contains data about the registered token.
+     * @return true if the request was successfully sent.
+     */
+    private Boolean sendSwitchInfo(String info){
         FileUploader uploader;
         try{
             uploader = new FileUploader(Main.serverAddress + RFIDController.REQ_RFIDSWITCH,
@@ -125,15 +130,17 @@ public class ServerChecker extends Thread{
                 
             String response = uploader.finish();
             if(response.equals(Main.OK_ANSWER)){
-                LOGGER.log(Level.INFO, "Switching by the token was logged on the server");              
+                LOGGER.log(Level.INFO, "Switching by the token was logged on the server");      
+                return true;
             }       
             else{
-                LOGGER.log(Level.INFO, "Switching be the token was not logged on the server");
+                LOGGER.log(Level.INFO, "Switching by the token was not logged on the server");
             }
         }
         catch(Exception e){
             LOGGER.log(Level.SEVERE, "--Server thread -- sending POST request failed", e); 
-        }           
+        }     
+        return false;
     }
     
     /**
@@ -147,11 +154,44 @@ public class ServerChecker extends Thread{
                     ATT_RPI,
                     URLEncoder.encode(Main.id, Main.DEFAULT_ENCODING));
             
-            Main.sendGETRequest(Main.serverAddress, query);
+            sendGETRequest(query);
             
         } catch (UnsupportedEncodingException ex) {
             LOGGER.log(Level.SEVERE, "--Sending checktask request failed", ex);
         }                      
+    }
+    
+    /**
+    * This method uses utility class {@link GetRequestSender} to send GET request
+    * @param request is a string to add to the server address.
+    * The method stores the answer in the queue for inside tasks in {@link #insideTasks}.
+    * @return true if the request was successfully sent.
+    */
+    public static Boolean sendGETRequest(String request){      
+        GetRequestSender sender = null;
+        try{
+            sender = new GetRequestSender(Main.serverAddress  + request, Main.DEFAULT_ENCODING);
+            LOGGER.log(Level.INFO, "-- Send request " + request + " to " + Main.serverAddress ); 
+            
+            String answer = sender.connect();
+
+            LOGGER.log(Level.INFO, "-- Answer: ", answer); 
+            if(!answer.equals(Main.NO_ANSWER) && !answer.equals(Main.ERROR_ANSWER)){
+                Main.insideTasks.add(answer);
+                        
+                LOGGER.log(Level.INFO, "-- Got inside task: {0}", answer);  
+            }
+            return true;
+        }
+        catch(Exception e){ 
+            LOGGER.log(Level.SEVERE, "-- Sending GET request to {0} failed", Main.serverAddress); 
+        }
+        finally{
+            if (sender != null){
+                sender.finish();
+            }
+        }
+        return false;
     }
     
     /**
@@ -168,24 +208,42 @@ public class ServerChecker extends Thread{
                     
                 //Parsing query for server to distinguish between GET and POST requests.
                 int index = Main.forServer.peek().indexOf("?");
-                String command = Main.forServer.peek().substring(0, index);
+                String command;
+                if(index != -1 ){
+                    command = Main.forServer.peek().substring(0, index);
+                }
+                else{
+                    command = Main.forServer.peek();
+                }
 
+                Boolean ok = false;
+                
                 switch (command) {
                     case COMMAND_GETSTATE:
                     case COMMAND_SWITCHOFF:
                     case COMMAND_SWITCHON:
                     case COMMAND_TAKEPHOTO:
                     case MotionController.REQ_MOTIONDETECTED:
-                        Main.sendGETRequest(Main.serverAddress, Main.forServer.poll());
+                        ok = sendGETRequest(Main.forServer.peek());
+                        if(ok){
+                            Main.forServer.poll();
+                        }
                         break;
                     case MotionController.REQ_PHOTOTAKEN:
-                        Main.sendGETRequest(Main.serverAddress, Main.forServer.poll());
+                        ok = sendGETRequest(Main.forServer.peek());
+                        if(ok){
+                            Main.forServer.poll();
+                        }
                         uploadPhoto();
                         break;
                     default:
                         if(command.startsWith(RFIDController.REQ_RFIDSWITCH)){
-                            sendSwitchInfo(command.substring(RFIDController.REQ_RFIDSWITCH.length()));
+                            ok = sendSwitchInfo(command.substring(RFIDController.REQ_RFIDSWITCH.length()));
+                            if(ok){
+                                Main.forServer.poll();
+                            }            
                         }
+                        ok = false;
                         break;
                 }
             }
