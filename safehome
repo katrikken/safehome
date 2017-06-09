@@ -16,10 +16,12 @@ case "$1" in
     start)
         echo "Starting safehome"
         /home/pi/Documents/apache-tomcat-8.5.15/bin/startup.sh
+		java -Dpi4j.linking=dynamic -jar /home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/com.kuryshee.safehome.rpi.jar
         ;;
     stop)
         echo "Stopping safehome"
         /home/pi/Documents/apache-tomcat-8.5.15/bin/shutdown.sh
+		pkill -f 'java -jar'
         ;;
     *)
         echo "Usage: /etc/init.d/safehome start|stop"
