@@ -10,46 +10,101 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
+ * This class initializes program threads and sets the configuration of the application.
  * @author Ekaterina Kurysheva
  */
 public class Main {
-    
+    /**
+     * This Raspberry Pi ID string.
+     */
     public static String id;
+    
+    /**
+     * The URL address of the main server.
+     */
     public static String serverAddress;
+    
+    /**
+     * The directory on the Raspberry Pi where the photos are saved to.
+     */
     public static String photoDir;
+    
+    /**
+     * The URL address of the local server on this Raspberry Pi.
+     */
     public static String localServerAddress;
 
+    /**
+     * The format of the saved photos.
+     */
     public static String formatOfImage = ".jpg";
 
-    //Standard charset for communication with server.
+    /**
+     * The default encoding for the communication over HTTP.
+     */
     public static final String DEFAULT_ENCODING = "UTF-8";
     
+    /**
+     * The definition of the answer when no data are available.
+     */
     public static final String NO_ANSWER = "no answer";
+    
+    /**
+     * The definition of the answer when everything went as expected.
+     */
     public static final String OK_ANSWER = "ok";
+    
+    /**
+     * The definition of the answer when error occurred.
+     */
     public static final String ERROR_ANSWER = "error";
      
-    /* Configuration file for RFID keys is created in the main method. 
-    * This is the explicit path for the file. */
+    /**
+     * The path to the configuration file with information about registered users.
+     */
     public static final String CONFIG_KEYSFILE = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/keys.txt";
     
-    //The path to the configuration file.
+    /**
+     * The path to the configuration file with definitions of variables 
+     * {@link #id}, {@link #localServerAddress}, {@link #photoDir}, {@link #serverAddress}.
+     */
     private static final String CONFIG_MAINFILE = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/config.txt";;
     
-    //Theese key words are for reading configuration files.
+    //Theese are key words for reading configuration files.
     private static final String KEYWORD_SERVER = "server";
     private static final String KEYWORD_PHOTO = "photo";
     private static final String KEYWORD_MYID = "myID";   
     private static final String KEYWORD_LOCSERVER ="locserver";
     private static final String KEYWORD_DELIM = "=";
     
-    //These queues contain tasks for threads.
+    /**
+     * This queue contains strings with tasks which should be processed by the {@link ServerChecker}.
+     */
     public static ConcurrentLinkedQueue<String> forServer = new ConcurrentLinkedQueue<>();
+    
+    /**
+     * This queue contains strings with tasks which should be processed by the {@link InsideTasksManager}.
+     */
     public static ConcurrentLinkedQueue<String> insideTasks = new ConcurrentLinkedQueue<>();
+    
+    /**
+     * This queue contains strings with tasks which should be processed by the {@link RFIDController}.
+     */
     public static ConcurrentLinkedQueue<String> forRFID = new ConcurrentLinkedQueue<>();
+    
+    /**
+     * This queue contains strings with tasks which should be processed by the {@link LocalServerChecker}.
+     */
     public static ConcurrentLinkedQueue<String> forLocalServer = new ConcurrentLinkedQueue<>();
+    
+    /**
+     * This queue contains strings with photo paths which should be processed by the {@link ServerChecker}.
+     */
     public static ConcurrentLinkedQueue<String> photoPaths = new ConcurrentLinkedQueue<>();
     
+    /**
+     * The instance of the {@link MotionController} class to control this Raspberry Pi GPIO pins.
+     */
     public static MotionController motionController;
     
     private static final Logger LOGGER = Logger.getLogger("RPi");

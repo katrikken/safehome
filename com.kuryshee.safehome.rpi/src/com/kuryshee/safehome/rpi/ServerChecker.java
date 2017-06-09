@@ -88,9 +88,9 @@ public class ServerChecker extends Thread{
      */
     private void uploadPhoto(){
         for(int i = 0; i < Main.photoPaths.size(); i++){
-            FileUploader uploader;
+            FormUploader uploader;
             try{
-                uploader = new FileUploader(Main.serverAddress + UPLOAD_PHOTO, Main.DEFAULT_ENCODING);
+                uploader = new FormUploader(Main.serverAddress + UPLOAD_PHOTO, Main.DEFAULT_ENCODING);
                 uploader.addFormField(TIME_PARAM, 
                         Main.photoPaths.peek().substring(
                                 Main.photoDir.length(), Main.photoPaths.peek().length() - Main.formatOfImage.length())
@@ -120,9 +120,9 @@ public class ServerChecker extends Thread{
      * @return true if the request was successfully sent.
      */
     private Boolean sendSwitchInfo(String info){
-        FileUploader uploader;
+        FormUploader uploader;
         try{
-            uploader = new FileUploader(Main.serverAddress + RFIDController.REQ_RFIDSWITCH,
+            uploader = new FormUploader(Main.serverAddress + RFIDController.REQ_RFIDSWITCH,
                     Main.DEFAULT_ENCODING);
 
             uploader.addFormField(ID_PARAM, Main.id);

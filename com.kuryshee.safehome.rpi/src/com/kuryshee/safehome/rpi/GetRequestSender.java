@@ -12,6 +12,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class implements the set of functions for sending GET requests.
+ * @author Ekaterina Kurysheva
+ */
 public class GetRequestSender {
 
     private HttpURLConnection connection;
@@ -19,9 +23,9 @@ public class GetRequestSender {
     private int TEN_SEC = 10000;
     
     /**
-     * This constructor creates a new instance of HttpURLConnection to form a GET request.
-     * @param query full URL address to set the connection.
-     * @param charset
+     * This constructor creates a new instance of {@link HttpURLConnection} class to form a GET request.
+     * @param query is a full URL address to set the connection.
+     * @param charset defines the encoding for the request.
      * @throws IOException
      */
     public GetRequestSender(String query, String charset) throws IOException{
@@ -34,6 +38,13 @@ public class GetRequestSender {
         connection.setConnectTimeout(TEN_SEC); 
     }
     
+    /**
+     * This method connects to the server and tries to get the answer.
+     * @return string with answer. 
+     * In case no answer arrived, returns {@link Main#NO_ANSWER}.
+     * In case error occurred, returns {@link Main#ERROR_ANSWER}.
+     * @throws IOException 
+     */
     public String connect() throws IOException{
         connection.connect();
         try(BufferedReader reader = new BufferedReader(
@@ -59,6 +70,9 @@ public class GetRequestSender {
         }
     }   
     
+    /**
+     * This method finishes the connection.
+     */
     public void finish(){
         if (connection != null){
             connection.disconnect();

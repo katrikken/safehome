@@ -72,9 +72,9 @@ public class LocalServerChecker extends Thread{
      * This method sends card ID read by RFID thread to local server as a POST request.
      */
     private void sendCardID(){
-        FileUploader uploader;
+        FormUploader uploader;
         try{
-            uploader = new FileUploader(Main.localServerAddress + COMMAND_READTOKEN, 
+            uploader = new FormUploader(Main.localServerAddress + COMMAND_READTOKEN, 
                     Main.DEFAULT_ENCODING);
             
             uploader.addFormField(ID_PARAM, Main.id);            
