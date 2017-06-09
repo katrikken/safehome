@@ -104,6 +104,7 @@ public class UserPage implements Serializable {
 				byte[] bytes = line.getBytes();
 				fstream.write(bytes);
 			}
+			RpiServlet.tasks.add(RpiServlet.COMMAND_UPDATEUSERS);
 			
 		} catch (IOException e) {
 			Logger.getLogger("userPage").log(Level.SEVERE, e.getMessage());

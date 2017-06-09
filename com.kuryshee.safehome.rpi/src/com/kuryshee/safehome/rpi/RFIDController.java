@@ -70,6 +70,9 @@ public class RFIDController extends Thread{
 	} catch (Exception e) {
             LOGGER.log(Level.SEVERE, "--Could not find key configuration file");
 	}
+        finally{
+            LOGGER.log(Level.INFO, "Registered tokens: " + rfidKeys.size());
+        }
     }
     
     /**
