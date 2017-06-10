@@ -151,7 +151,7 @@ public class MotionController{
      */
     private void report(String command){
         Map<String, String> atts = new HashMap<>();
-        atts.put(ServerChecker.ATT_RPI, Main.id);
+        atts.put(ServerChecker.ID_PARAM, Main.id);
            
         String query = GetRequestSender.formatQuery(command, atts, Main.DEFAULT_ENCODING);
         Main.forServer.add(query);

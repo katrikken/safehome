@@ -29,11 +29,6 @@ public class ServerChecker extends Thread{
     public static final String COMMAND_SWITCHON = "/switchon";
     
     /**
-     * The constant for reporting switching the program state to by the token.
-     */
-    public static final String REQ_RFIDSWITCH = "/rfid";
-    
-    /**
      * The constant for the server to ask for the program state.
      */
     public static final String COMMAND_GETSTATE = "/getstate";
@@ -67,11 +62,6 @@ public class ServerChecker extends Thread{
      * The constant for the POST request parameter containing the name associated with used RFID token.
      */
     public static final String RFID_PARAM = "rfid";
-    
-    /**
-     * The constant for the GET request parameter of this Raspberry Pi ID.
-     */
-    public static final String ATT_RPI = "rpi";
     
     /**
      * The constant for the GET request parameter containing short answer.
@@ -151,7 +141,7 @@ public class ServerChecker extends Thread{
         try {
             query = String.format("%s?%s=%s", 
                     REQ_CHECKTASK,
-                    ATT_RPI,
+                    ID_PARAM,
                     URLEncoder.encode(Main.id, Main.DEFAULT_ENCODING));
             
             sendGETRequest(query);

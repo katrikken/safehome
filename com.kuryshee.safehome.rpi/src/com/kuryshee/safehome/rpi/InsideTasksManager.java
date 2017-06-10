@@ -46,7 +46,7 @@ public class InsideTasksManager extends Thread{
      */
     private void getstateTask(){
         Map<String, String> atts = new HashMap<>();
-        atts.put(ServerChecker.ATT_RPI, Main.id);
+        atts.put(ServerChecker.ID_PARAM, Main.id);
         atts.put(ServerChecker.ATT_ANSWER, 
                 Main.motionController.getStateString());
            
