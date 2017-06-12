@@ -1,8 +1,10 @@
 package com.kuryshee.safehome.server;
 
+import com.kuryshee.safehome.requestprocessorinterface.RequestProcessor;
+
 public class AppRequestProcessor implements RequestProcessor{
 
-	private static final String NO_ANSWER_RPI = "Device is unreachable";
+	/*private static final String NO_ANSWER_RPI = "Device is unreachable";
 	
 	private String doCommandAPP(String command, String query){
 		
@@ -64,20 +66,21 @@ public class AppRequestProcessor implements RequestProcessor{
 			return SafeHomeServer.NO_ANSWER;
 		}
 	}
-	
+	*/
 	@Override
 	public String process(String command, String query) {
 		log.info("--processAppRequest got command: " + command);
 		if(command.equals(SafeHomeServer.COMMAND_GETSTATE) | command.equals(SafeHomeServer.COMMAND_SWITCHOFF)
 					| command.equals(SafeHomeServer.COMMAND_SWITCHON)){
-			return doCommandAPP(command, query);
+			//return doCommandAPP(command, query);
 		}
 		else if(command.equals(SafeHomeServer.REQ_CHECKTASK)){
-			return checktaskAPP(query);
+			//return checktaskAPP(query);
 		}
 		else{
 			return SafeHomeServer.NO_ANSWER;
-		}		
+		}	
+		return SafeHomeServer.NO_ANSWER;
 	}
 
 }

@@ -6,21 +6,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.kuryshee.safehome.requestprocessorinterface.RequestProcessor;
+
 @WebServlet(loadOnStartup = 1, urlPatterns = {"/SafeHomeServer", "/SafeHomeServer/rpi/*", "/SafeHomeServer/app/*"})
-
-//klient posila login, heslo -> 
-//server vraci id zarizeni a id klienta -> klient (vybira zarizeni) dalsi requesty posila s parametry user a rpi
-
+@MultipartConfig
 /**
  * This class extends HttpServlet and overrides doGet and doPost methods.
  */
@@ -43,18 +45,40 @@ public class SafeHomeServer extends HttpServlet {
 	public static final String COMMAND_SWITCHON = "/switchon";
 	public static final String COMMAND_TAKEPHOTO = "/takephoto";
 	
-	private static final String UPLOAD_PHOTO = "/upload"; 
+	public static final String UPLOAD_PHOTO = "/upload"; 
 	
 	public static final String NO_ANSWER = "no answer";
 	
 	public static final String OK_ANSWER = "ok";
-	private static final String ERROR_ANSWER = "error";
+	public static final String ERROR_ANSWER = "error";
 	
-	public static ConcurrentMap<String, String> forRpi = new ConcurrentHashMap<>();
-	public static ConcurrentMap<String, String> forApp = new ConcurrentHashMap<>();
+	public static final String RPI_PARAM = "rpi";
+	public static final String ANSWR_PARAM = "answer";
+	/**
+     * The constant for the POST request parameter containing the name associated with used RFID token.
+     */
+    public static final String RFID_PARAM = "rfid";
+    
+    /**
+     * The constant for the POST request parameter of time.
+     */
+    public static final String TIME_PARAM = "time";
+    
+    /**
+     * The constant for the POST request parameter of photo.
+     */
+    public static final String PHOTO_PARAM = "photo";
+    
+    /**
+     * The constant for key of a property for insertion into database.
+     */
+    public static final String COMMAND_PARAM = "command";
+    
+    public static final String PHOTO_PATH = "/Pictures/";
 	
-	RpiRequestProcessor rpiProcessor = new RpiRequestProcessor();
-	AppRequestProcessor appProcessor = new AppRequestProcessor();
+	public static ConcurrentMap<String, ConcurrentLinkedQueue<String>> forRpi = new ConcurrentHashMap<>();
+	public static ConcurrentMap<String, ConcurrentLinkedQueue<String>> forApp = new ConcurrentHashMap<>();
+
 	private static Logger log = Logger.getLogger("My Servlet");
 	
 	/**
@@ -62,26 +86,29 @@ public class SafeHomeServer extends HttpServlet {
 	 * @throws ServletException, IOException.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		RequestProcessor processor;
 		
 		String path = request.getRequestURI();
 		String query = request.getQueryString();
 		
 		if(path.startsWith(servletPathApp, 0)){
 			
-			log.info("--Got app request ");
+			log.log(Level.INFO, "--Got app request {0}", path + " " + query);
 			
 			String command = path.substring(servletPathApp.length());
-			response.getWriter().println(appProcessor.process(command, query));	
+			processor = new AppRequestProcessor();
+			response.getWriter().println(processor.process(command, query));	
 		}
 		else if(path.startsWith(servletPathRPi, 0)){
 			
-			log.info("--Got rpi request");
+			log.log(Level.INFO, "--Got rpi request {0}", path + " " + query);
 			
 			String command = path.substring(servletPathRPi.length());
-			response.getWriter().println(rpiProcessor.process(command, query));
+			processor = new RpiRequestProcessor();
+			response.getWriter().println(processor.process(command, query));
 		}
 		else{
-			log.warning("--Invalid GET request " + path + query);
+			log.log(Level.WARNING, "--Invalid GET request {0}", path + " " + query);
 		}
 	}
 	
@@ -91,17 +118,18 @@ public class SafeHomeServer extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String path = request.getRequestURI();
+		
 		if(path.startsWith(servletPathRPi + UPLOAD_PHOTO, 0)){
-		    String rpiId = request.getParameter("rpi"); 
-		    Part filePart = request.getPart("photo"); 
-		    String fileName = rpiId + "_" + request.getParameter("time"); 
-		    InputStream fileContent = filePart.getInputStream();
-		    
-		    File photo = new File(fileName + ".jpg");
-		    byte[] buffer = new byte[fileContent.available()];
-		    fileContent.read(buffer);
-		    OutputStream outStream = new FileOutputStream(photo);
-		    outStream.write(buffer);
+			RpiRequestProcessor processor = new RpiRequestProcessor();
+			String answer = processor.uploadPhoto(request);
+			response.getWriter().println(answer);
+			log.info("-- Got new photo " + answer);
+		}
+		else if(path.startsWith(servletPathRPi + REQ_RFIDSWITCH, 0)){
+			RpiRequestProcessor processor = new RpiRequestProcessor();
+			String answer = processor.RFIDswitch(request);
+			response.getWriter().println(answer);
+			log.info("-- RFID switch " + answer);
 		}
 		else{
 			log.warning("--Invalid POST request " + path);
