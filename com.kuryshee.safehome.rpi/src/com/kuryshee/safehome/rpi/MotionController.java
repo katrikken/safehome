@@ -27,7 +27,7 @@ public class MotionController{
     /**
      * The date format which is used to capture the time when the photo is taken.
      */
-    private DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");   
+    public static DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");   
     
     /**
      * The constant which is added to the address of a server when reporting motion detection.  
@@ -89,8 +89,11 @@ public class MotionController{
         GpioInterrupt.addListener((GpioInterruptEvent event) -> {
             if(isON() && event.getState()){
                 LOGGER.log(Level.INFO, " --> GPIO triggered");
-      
-                report(REQ_MOTIONDETECTED);
+                
+                String date = dateFormat.format(new Date());
+                Map<String, String> atts = new HashMap<>();
+                atts.put(ServerChecker.TIME_PARAM, date);
+                report(REQ_MOTIONDETECTED, atts);
 
                 takePhoto();         
             }
@@ -121,7 +124,8 @@ public class MotionController{
             LOGGER.log(Level.INFO, "--Inside thread - took photo at: {0}", path);
 
             Main.photoPaths.add(path);
-            report(REQ_PHOTOTAKEN);
+            
+            report(REQ_PHOTOTAKEN, null);
         }
         catch(IOException e){
             LOGGER.log(Level.WARNING, "--Inside thread - could not take a photo");
@@ -133,7 +137,9 @@ public class MotionController{
      */
     public void switchOff(){       
         setON(false);
-        report(ServerChecker.COMMAND_SWITCHOFF);
+        Map<String, String> atts = new HashMap<>();
+        atts.put(ServerChecker.ATT_ANSWER, Main.OK_ANSWER);
+        report(ServerChecker.COMMAND_SWITCHOFF, atts);
     }
     
     /**
@@ -141,18 +147,25 @@ public class MotionController{
      */
     public void switchOn(){
         setON(true);
-        report(ServerChecker.COMMAND_SWITCHON);
+        Map<String, String> atts = new HashMap<>();
+        atts.put(ServerChecker.ATT_ANSWER, Main.OK_ANSWER);
+        report(ServerChecker.COMMAND_SWITCHON, atts);
     }
     
     /**
      * This method creates a query string to specify the state of the application and passes it to the {@link Main#forServer}.
+     * It adds this Raspberry Pi id to every query.
      * @param command specifies the command upon which the state has been changed.
+     * @param atts is a map of attributes and their values.
      * @param atts is a map of attributes for the query. In case it is null, the default attribute with this Raspberry Pi id is added.
      */
-    private void report(String command){
-        Map<String, String> atts = new HashMap<>();
-        atts.put(ServerChecker.ID_PARAM, Main.id);
+    private void report(String command, Map<String, String> atts){
+        if(atts == null){
+            atts = new HashMap<>();          
+        }         
            
+        atts.put(ServerChecker.ID_PARAM, Main.id);
+        
         String query = GetRequestSender.formatQuery(command, atts, Main.DEFAULT_ENCODING);
         Main.forServer.add(query);
     }

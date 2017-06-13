@@ -3,6 +3,7 @@ package com.kuryshee.safehome.rpi;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,8 +76,9 @@ public class ServerChecker extends Thread{
 
     /**
      * This method uploads photos to the server.
+     * @return true if the photo was successfully sent.
      */
-    private void uploadPhoto(){
+    private Boolean uploadPhoto(){
         for(int i = 0; i < Main.photoPaths.size(); i++){
             FormUploader uploader;
             try{
@@ -92,7 +94,8 @@ public class ServerChecker extends Thread{
                 if(response.equals(Main.OK_ANSWER)){
                     LOGGER.log(Level.INFO, "Photo {0} was successfully sent.", Main.photoPaths.peek());
                     
-                    Main.photoPaths.poll();                
+                    Main.photoPaths.poll();      
+                    return true;
                 }       
                 else{
                     LOGGER.log(Level.INFO, "Photo has not been sent. Server response: {0}", response);
@@ -102,6 +105,7 @@ public class ServerChecker extends Thread{
                 LOGGER.log(Level.SEVERE, "--Server thread -- sending POST request failed", e); 
             }        
         }
+        return false;
     }
     
     /**
@@ -117,6 +121,7 @@ public class ServerChecker extends Thread{
 
             uploader.addFormField(ID_PARAM, Main.id);
             uploader.addFormField(RFID_PARAM, info);
+            uploader.addFormField(TIME_PARAM, MotionController.dateFormat.format(new Date()));
                 
             String response = uploader.finish();
             if(response.equals(Main.OK_ANSWER)){
@@ -220,11 +225,10 @@ public class ServerChecker extends Thread{
                         }
                         break;
                     case MotionController.REQ_PHOTOTAKEN:
-                        ok = sendGETRequest(Main.forServer.peek());
+                        ok = uploadPhoto();
                         if(ok){
                             Main.forServer.poll();
                         }
-                        uploadPhoto();
                         break;
                     default:
                         if(command.startsWith(RFIDController.REQ_RFIDSWITCH)){
