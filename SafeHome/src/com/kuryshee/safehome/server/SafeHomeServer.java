@@ -45,7 +45,7 @@ public class SafeHomeServer extends HttpServlet {
 	public static final String COMMAND_SWITCHON = "/switchon";
 	public static final String COMMAND_TAKEPHOTO = "/takephoto";
 	
-	private static final String UPLOAD_PHOTO = "/upload"; 
+	public static final String UPLOAD_PHOTO = "/upload"; 
 	
 	public static final String NO_ANSWER = "no answer";
 	
@@ -69,7 +69,12 @@ public class SafeHomeServer extends HttpServlet {
      */
     public static final String PHOTO_PARAM = "photo";
     
-    public static final String PHOTO_PATH = "/Pictures/";
+    /**
+     * The constant for key of a property for insertion into database.
+     */
+    public static final String COMMAND_PARAM = "command";
+    
+    public static final String PHOTO_PATH = "Pictures\\";
 	
 	public static ConcurrentMap<String, ConcurrentLinkedQueue<String>> forRpi = new ConcurrentHashMap<>();
 	public static ConcurrentMap<String, ConcurrentLinkedQueue<String>> forApp = new ConcurrentHashMap<>();
@@ -115,16 +120,16 @@ public class SafeHomeServer extends HttpServlet {
 		String path = request.getRequestURI();
 		
 		if(path.startsWith(servletPathRPi + UPLOAD_PHOTO, 0)){
+			log.info("-- Got new photo");
 			RpiRequestProcessor processor = new RpiRequestProcessor();
 			String answer = processor.uploadPhoto(request);
-			response.getWriter().println(answer);
-			log.info("-- Got new photo " + answer);
+			response.getWriter().println(answer);		
 		}
 		else if(path.startsWith(servletPathRPi + REQ_RFIDSWITCH, 0)){
+			log.info("-- RFID switch");
 			RpiRequestProcessor processor = new RpiRequestProcessor();
 			String answer = processor.RFIDswitch(request);
-			response.getWriter().println(answer);
-			log.info("-- RFID switch " + answer);
+			response.getWriter().println(answer);		
 		}
 		else{
 			log.warning("--Invalid POST request " + path);

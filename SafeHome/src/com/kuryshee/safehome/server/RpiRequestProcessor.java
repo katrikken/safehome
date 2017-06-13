@@ -1,10 +1,12 @@
 package com.kuryshee.safehome.server;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kuryshee.safehome.database.DatabaseAccessInterface;
 import com.kuryshee.safehome.postrequestretriever.DataRetriever;
 import com.kuryshee.safehome.requestprocessorinterface.RequestProcessor;
 
@@ -55,18 +57,24 @@ public class RpiRequestProcessor implements RequestProcessor{
 		DataRetriever dr = new DataRetriever();		
 		String rpi = dr.getTextPart(request, SafeHomeServer.RPI_PARAM);
 		String rfid = dr.getTextPart(request, SafeHomeServer.RFID_PARAM);
+		String time = dr.getTextPart(request, SafeHomeServer.TIME_PARAM);
 		
 		if(!rpi.isEmpty() && !rfid.isEmpty()){
-			//database?
-			/*try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(rpiId, true)))){
-				    out.println("User key from " + user + " was detected.");
-			} catch (IOException e) {
-				log.severe(e.getMessage());	
-			}*/
-			return SafeHomeServer.OK_ANSWER;
+			HashMap<String, String> values = new HashMap<>();
+			values.put(SafeHomeServer.RPI_PARAM, rpi);
+			values.put(SafeHomeServer.RFID_PARAM, rfid);
+			values.put(SafeHomeServer.TIME_PARAM, time);
+			values.put(SafeHomeServer.COMMAND_PARAM, SafeHomeServer.REQ_RFIDSWITCH);
+			
+			DatabaseAccessInterface db = new MockDatabaseAccess();
+			Boolean status = false;
+			status = db.connect(null, null);
+			status = db.insert("My table", values);
+			if(status)
+				return SafeHomeServer.OK_ANSWER;
 		}
-		else
-			return SafeHomeServer.ERROR_ANSWER;
+		
+		return SafeHomeServer.ERROR_ANSWER;
 	}
 	
 	/**
@@ -84,14 +92,19 @@ public class RpiRequestProcessor implements RequestProcessor{
 			String fileName = rpi + "_" + time; 
 		    
 			Boolean ok = dr.saveFilePart(request, SafeHomeServer.PHOTO_PARAM, SafeHomeServer.PHOTO_PATH + fileName);
-			if(ok){
-			//database?
-				/*try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(rpiId, true)))){
-					    
-				} catch (IOException e) {
-					log.severe(e.getMessage());	
-				}*/
-				return SafeHomeServer.OK_ANSWER;
+			if(ok){		
+				HashMap<String, String> values = new HashMap<>();
+				values.put(SafeHomeServer.RPI_PARAM, rpi);
+				values.put(SafeHomeServer.TIME_PARAM, time);
+				values.put(SafeHomeServer.PHOTO_PARAM, SafeHomeServer.PHOTO_PATH + fileName);
+				values.put(SafeHomeServer.COMMAND_PARAM, SafeHomeServer.UPLOAD_PHOTO);
+				
+				DatabaseAccessInterface db = new MockDatabaseAccess();
+				Boolean status = false;
+				status = db.connect(null, null);
+				status = db.insert("My table", values);
+				if(status)
+					return SafeHomeServer.OK_ANSWER;
 			}
 		}
 
@@ -106,21 +119,22 @@ public class RpiRequestProcessor implements RequestProcessor{
 	private String RFIDevent(String command, String query){
 		Map<String, String> params = parseQuery(query);
 		String rpiId = params.get(SafeHomeServer.RPI_PARAM);
+		String time = params.get(SafeHomeServer.TIME_PARAM);
 		
 		if(rpiId != null){
-			//database?
-			/*try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(rpiId, true)))){
-				if(command.equals(REQ_MOTIONDETECTED)){
-				    out.println("Motion was detected.");
-				}
-				else{
-					out.println("Photo was made.");
-				}
-			} catch (IOException e) {
-				log.severe(e.getMessage());	
-			}*/
+			HashMap<String, String> values = new HashMap<>();
+			values.put(SafeHomeServer.RPI_PARAM, rpiId);
+			if(time != null ){
+				values.put(SafeHomeServer.TIME_PARAM, time);
+			}
+			values.put(SafeHomeServer.COMMAND_PARAM, command);
 			
-			return SafeHomeServer.OK_ANSWER;
+			DatabaseAccessInterface db = new MockDatabaseAccess();
+			Boolean status = false;
+			status = db.connect(null, null);
+			status = db.insert("My table", values);
+			if(status)
+				return SafeHomeServer.OK_ANSWER;
 		}
 	
 		return SafeHomeServer.ERROR_ANSWER;
@@ -161,7 +175,7 @@ public class RpiRequestProcessor implements RequestProcessor{
 	@Override
 	public String process(String command, String query) {
 		if(command.equals(SafeHomeServer.COMMAND_GETSTATE) | command.equals(SafeHomeServer.COMMAND_SWITCHOFF)
-				| command.equals(SafeHomeServer.COMMAND_SWITCHON) | command.equals(SafeHomeServer.REQ_PHOTOTAKEN)){
+				| command.equals(SafeHomeServer.COMMAND_SWITCHON)){
 			return sendAnswerFromRPItoApp(command, query);
 		}
 		else if (command.equals(SafeHomeServer.REQ_CHECKTASK)){
