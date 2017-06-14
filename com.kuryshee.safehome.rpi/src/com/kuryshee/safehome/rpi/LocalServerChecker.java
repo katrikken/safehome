@@ -1,5 +1,8 @@
 package com.kuryshee.safehome.rpi;
 
+import com.kuryshee.safehome.httprequestsender.AnswerConstants;
+import com.kuryshee.safehome.httprequestsender.GetRequestSender;
+import com.kuryshee.safehome.httprequestsender.FormUploader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -81,7 +84,7 @@ public class LocalServerChecker extends Thread{
             uploader.addFormField(CARD_PARAM, Main.forLocalServer.peek().substring(COMMAND_READTOKEN.length()));
             String response = uploader.finish();
             
-            if(response.equals(Main.OK_ANSWER)){
+            if(response.equals(AnswerConstants.OK_ANSWER)){
                 Main.forLocalServer.poll();
             }         
         }
@@ -105,7 +108,7 @@ public class LocalServerChecker extends Thread{
             String answer = sender.connect();
 
             LOGGER.log(Level.INFO, "-- Answer: ", answer); 
-            if(!answer.equals(Main.NO_ANSWER) && !answer.equals(Main.ERROR_ANSWER)){
+            if(!answer.equals(AnswerConstants.NO_ANSWER) && !answer.equals(AnswerConstants.ERROR_ANSWER)){
                 Main.insideTasks.add(answer);
                         
                 LOGGER.log(Level.INFO, "-- Got inside task: {0}", answer);  

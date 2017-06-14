@@ -5,6 +5,7 @@
         <group>
             <file>file:/C:/Users/kurys_000/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/Main.java</file>
             <file>file:/C:/Users/kurys_000/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/GetRequestSender.java</file>
+            <file>file:/C:/Users/kurys_000/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/FormUploader.java</file>
             <file>file:/C:/Users/kurys_000/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/RFIDController.java</file>
             <file>file:/C:/Users/kurys_000/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/MotionController.java</file>
             <file>file:/C:/Users/kurys_000/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/InsideTasksManager.java</file>

@@ -1,5 +1,7 @@
 package com.kuryshee.safehome.rpi;
 
+import com.kuryshee.safehome.httprequestsender.AnswerConstants;
+import com.kuryshee.safehome.httprequestsender.GetRequestSender;
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioInterrupt;
 import com.pi4j.wiringpi.GpioInterruptEvent;
@@ -138,7 +140,7 @@ public class MotionController{
     public void switchOff(){       
         setON(false);
         Map<String, String> atts = new HashMap<>();
-        atts.put(ServerChecker.ATT_ANSWER, Main.OK_ANSWER);
+        atts.put(ServerChecker.ATT_ANSWER, AnswerConstants.OK_ANSWER);
         report(ServerChecker.COMMAND_SWITCHOFF, atts);
     }
     
@@ -148,7 +150,7 @@ public class MotionController{
     public void switchOn(){
         setON(true);
         Map<String, String> atts = new HashMap<>();
-        atts.put(ServerChecker.ATT_ANSWER, Main.OK_ANSWER);
+        atts.put(ServerChecker.ATT_ANSWER, AnswerConstants.OK_ANSWER);
         report(ServerChecker.COMMAND_SWITCHON, atts);
     }
     

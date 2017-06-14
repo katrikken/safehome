@@ -1,5 +1,6 @@
 package com.kuryshee.safehome.rpi;
 
+import com.kuryshee.safehome.httprequestsender.GetRequestSender;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;

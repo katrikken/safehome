@@ -1,5 +1,6 @@
 package com.kuryshee.safehome.rpi;
 
+import com.kuryshee.safehome.httprequestsender.AnswerConstants;
 import com.liangyuen.util.Convert;
 import com.liangyuen.util.RaspRC522;
 import java.io.BufferedReader;
@@ -113,14 +114,14 @@ public class RFIDController extends Thread{
         
         if(!token.equals(ZEROTAG)){
             if(rfidKeys.containsKey(token)){
-                Main.forLocalServer.add(LocalServerChecker.COMMAND_READTOKEN + Main.ERROR_ANSWER);
+                Main.forLocalServer.add(LocalServerChecker.COMMAND_READTOKEN + AnswerConstants.ERROR_ANSWER);
             }
             else{
                 Main.forLocalServer.add(LocalServerChecker.COMMAND_READTOKEN + token);
             }
         }
         else{
-            Main.forLocalServer.add(LocalServerChecker.COMMAND_READTOKEN + Main.ERROR_ANSWER);
+            Main.forLocalServer.add(LocalServerChecker.COMMAND_READTOKEN + AnswerConstants.ERROR_ANSWER);
         }
     }
     

@@ -1,5 +1,8 @@
 package com.kuryshee.safehome.rpi;
 
+import com.kuryshee.safehome.httprequestsender.AnswerConstants;
+import com.kuryshee.safehome.httprequestsender.GetRequestSender;
+import com.kuryshee.safehome.httprequestsender.FormUploader;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -91,7 +94,7 @@ public class ServerChecker extends Thread{
 
                 uploader.addFilePart(PHOTO_PARAM, new File(Main.photoPaths.peek()));
                 String response = uploader.finish();
-                if(response.equals(Main.OK_ANSWER)){
+                if(response.equals(AnswerConstants.OK_ANSWER)){
                     LOGGER.log(Level.INFO, "Photo {0} was successfully sent.", Main.photoPaths.peek());
                     
                     Main.photoPaths.poll();      
@@ -124,7 +127,7 @@ public class ServerChecker extends Thread{
             uploader.addFormField(TIME_PARAM, MotionController.dateFormat.format(new Date()));
                 
             String response = uploader.finish();
-            if(response.equals(Main.OK_ANSWER)){
+            if(response.equals(AnswerConstants.OK_ANSWER)){
                 LOGGER.log(Level.INFO, "Switching by the token was logged on the server");      
                 return true;
             }       
@@ -171,7 +174,7 @@ public class ServerChecker extends Thread{
             String answer = sender.connect();
 
             LOGGER.log(Level.INFO, "-- Answer: ", answer); 
-            if(!answer.equals(Main.NO_ANSWER) && !answer.equals(Main.ERROR_ANSWER)){
+            if(!answer.equals(AnswerConstants.NO_ANSWER) && !answer.equals(AnswerConstants.ERROR_ANSWER)){
                 Main.insideTasks.add(answer);
                         
                 LOGGER.log(Level.INFO, "-- Got inside task: {0}", answer);  
