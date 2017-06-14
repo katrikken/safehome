@@ -1,8 +1,12 @@
 package com.kuryshee.safehome.server;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import com.kuryshee.safehome.requestprocessorinterface.RequestProcessor;
 
 public class AppRequestProcessor implements RequestProcessor{
+	private int ONE_SEC = 1000;
 
 	/*private static final String NO_ANSWER_RPI = "Device is unreachable";
 	
@@ -67,15 +71,61 @@ public class AppRequestProcessor implements RequestProcessor{
 		}
 	}
 	*/
+	
+	/**
+	 * This method adds the task to the queue for Raspberry Pi and delivers answer.
+	 * @param command specifies the task.
+	 * @param query contains identification data.
+	 * @return answer from the Raspberry Pi or {@link SafeHomeServer#NO_ANSWER} if no answer was provided.
+	 */
+	private String redirectTask(String command, String query){
+		Map<String, String> params = parseQuery(query);
+		String rpi = params.get(SafeHomeServer.RPI_PARAM);
+		
+		if(rpi != null){
+			//Redirect the task
+			SafeHomeServer.forRpi.putIfAbsent(rpi, new ConcurrentLinkedQueue<String>());
+			SafeHomeServer.forRpi.get(rpi).add(command); 
+			
+			//Wait for the answer
+			int tries = 10;
+			for(int i = 0; i < tries; i++){
+				if(SafeHomeServer.forApp.containsKey(rpi) && !SafeHomeServer.forApp.get(rpi).isEmpty()){
+					if(SafeHomeServer.forApp.get(rpi).peek().startsWith(command)){
+						return SafeHomeServer.forApp.get(rpi).poll();
+					}
+				}
+				try {
+					Thread.sleep(ONE_SEC);
+				} catch (InterruptedException e) {
+					log.severe(e.getMessage());	
+				}
+			}
+		}
+		SafeHomeServer.forRpi.get(rpi).remove(command);
+		return SafeHomeServer.NO_ANSWER;
+	}
+	
+	/**
+	 * This method is a mock for verifying user credentials.
+	 * @param query contains the credentials.
+	 * @return associated Raspberry Pi ID in case the data are valid.
+	 */
+	private String verifyUser(String query){
+		return "rpi";
+	}
+	
 	@Override
 	public String process(String command, String query) {
-		log.info("--processAppRequest got command: " + command);
 		if(command.equals(SafeHomeServer.COMMAND_GETSTATE) | command.equals(SafeHomeServer.COMMAND_SWITCHOFF)
 					| command.equals(SafeHomeServer.COMMAND_SWITCHON)){
-			//return doCommandAPP(command, query);
+			return redirectTask(command, query);
 		}
 		else if(command.equals(SafeHomeServer.REQ_CHECKTASK)){
 			//return checktaskAPP(query);
+		}
+		else if(command.equals(SafeHomeServer.REQ_LOGIN)){
+			return verifyUser(query);
 		}
 		else{
 			return SafeHomeServer.NO_ANSWER;

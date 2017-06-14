@@ -82,6 +82,11 @@ public class SafeHomeServer extends HttpServlet {
     public static final String REQ_RFIDSWITCH = "/rfid";
     
     /**
+     * The constant which is added to the address of a server when the client application verifies user credentials.
+     */
+    public static final String REQ_LOGIN = "/login";
+    
+    /**
      * The definition of the answer when no data are available.
      */
     public static final String NO_ANSWER = "no answer";

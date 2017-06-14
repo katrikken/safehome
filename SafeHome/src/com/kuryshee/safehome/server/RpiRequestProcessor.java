@@ -34,7 +34,7 @@ public class RpiRequestProcessor implements RequestProcessor{
 			
 			if(rpi != null && answer != null){
 				SafeHomeServer.forApp.putIfAbsent(rpi, new ConcurrentLinkedQueue<String>());
-				SafeHomeServer.forApp.get(rpi).add(answer);
+				SafeHomeServer.forApp.get(rpi).add(command + "=" + answer);
 				
 				return SafeHomeServer.OK_ANSWER;
 			}
