@@ -4,17 +4,6 @@ import android.os.AsyncTask;
 import com.kuryshee.safehome.httprequestsender.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.content.Context;
-import android.app.IntentService;
-import android.content.Intent;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 /**
  *
@@ -32,20 +21,20 @@ public class SendGetRequest extends AsyncTask<String, Void, String[]>  {
     protected String[] doInBackground(String... requests) {
         int count = requests.length;
         String[] answers = new String[count];
+        answers[0] = AnswerConstants.NO_ANSWER;
+
         for (int i = 0; i < count; i++) {
             GetRequestSender sender = null;
-            try{
-                sender = new GetRequestSender(serverAddress  + requests[i], DEFAULT_ENCODING);
+            try {
+                sender = new GetRequestSender(serverAddress + requests[i], DEFAULT_ENCODING);
 
                 String answer = sender.connect();
                 LOGGER.log(Level.INFO, "-- Server answer: " + answer);
                 answers[i] = answer;
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "-- Sending GET request failed", e);
-            }
-            finally{
-                if (sender != null){
+            } finally {
+                if (sender != null) {
                     sender.finish();
                 }
             }
