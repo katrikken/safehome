@@ -115,6 +115,41 @@ public class AppRequestProcessor implements RequestProcessor{
 		return "rpi";
 	}
 	
+	/**
+	 * This method manages redirecting information about taking pictures on the Raspberry Pi, 
+	 * which follows slightly different logic than {@link #redirectTask(String, String)} method.
+	 * @param query contains Raspberry Pi ID.
+	 * @return {@link SafeHomeServer#OK_ANSWER} if the photo was taken and {@link SafeHomeServer#NO_ANSWER} otherwise.
+	 */
+	private String waitForAPhoto(String query){
+		Map<String, String> params = parseQuery(query);
+		String rpi = params.get(SafeHomeServer.RPI_PARAM);
+		
+		if(rpi != null){
+			//Redirect the task
+			SafeHomeServer.forRpi.putIfAbsent(rpi, new ConcurrentLinkedQueue<String>());
+			SafeHomeServer.forRpi.get(rpi).add(SafeHomeServer.COMMAND_TAKEPHOTO); 
+			
+			//Wait for the answer
+			int tries = 10;
+			for(int i = 0; i < tries; i++){
+				if(SafeHomeServer.forApp.containsKey(rpi) && !SafeHomeServer.forApp.get(rpi).isEmpty()){
+					if(SafeHomeServer.forApp.get(rpi).peek().equals(SafeHomeServer.REQ_PHOTOTAKEN)){
+						SafeHomeServer.forApp.get(rpi).poll();
+						return SafeHomeServer.OK_ANSWER;
+					}
+				}
+				try {
+					Thread.sleep(ONE_SEC);
+				} catch (InterruptedException e) {
+					log.severe(e.getMessage());	
+				}
+			}
+		}
+		SafeHomeServer.forRpi.get(rpi).remove(SafeHomeServer.COMMAND_TAKEPHOTO);
+		return SafeHomeServer.NO_ANSWER;
+	}
+	
 	@Override
 	public String process(String command, String query) {
 		if(command.equals(SafeHomeServer.COMMAND_GETSTATE) | command.equals(SafeHomeServer.COMMAND_SWITCHOFF)
@@ -127,10 +162,12 @@ public class AppRequestProcessor implements RequestProcessor{
 		else if(command.equals(SafeHomeServer.REQ_LOGIN)){
 			return verifyUser(query);
 		}
+		else if(command.equals(SafeHomeServer.COMMAND_TAKEPHOTO)){
+			return waitForAPhoto(query);
+		}
 		else{
 			return SafeHomeServer.NO_ANSWER;
 		}	
 		return SafeHomeServer.NO_ANSWER;
 	}
-
 }

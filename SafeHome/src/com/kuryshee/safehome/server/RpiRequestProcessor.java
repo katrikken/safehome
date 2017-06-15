@@ -25,7 +25,7 @@ public class RpiRequestProcessor implements RequestProcessor{
 	 * In case RPi answer was successfully forwarded, returns {@link SafeHomeServer#OK_ANSWER}, otherwise {@link SafeHomeServer#ERROR_ANSWER}.
 	 */
 	private String sendAnswerFromRPItoApp(String command, String query){
-		log.info("--sendAnswerFromRPI: " + command + "&" + query);
+		log.info("--sendAnswerFromRPI: " + command + "?" + query);
 
 		try {
 			Map<String, String> params = parseQuery(query);
@@ -103,8 +103,13 @@ public class RpiRequestProcessor implements RequestProcessor{
 				Boolean status = false;
 				status = db.connect(null, null);
 				status = db.insert("My table", values);
-				if(status)
+				if(status){
+					SafeHomeServer.forApp.putIfAbsent(rpi, new ConcurrentLinkedQueue<String>());
+					SafeHomeServer.forApp.get(rpi).add(SafeHomeServer.REQ_PHOTOTAKEN);
+					log.info("--Send event to the app " + SafeHomeServer.REQ_PHOTOTAKEN);
+				
 					return SafeHomeServer.OK_ANSWER;
+				}
 			}
 		}
 
@@ -133,8 +138,13 @@ public class RpiRequestProcessor implements RequestProcessor{
 			Boolean status = false;
 			status = db.connect(null, null);
 			status = db.insert("My table", values);
-			if(status)
+			if(status){
+				SafeHomeServer.forApp.putIfAbsent(rpiId, new ConcurrentLinkedQueue<String>());
+				SafeHomeServer.forApp.get(rpiId).add(command);
+				log.info("--Send event to the app " + command);
+				
 				return SafeHomeServer.OK_ANSWER;
+			}
 		}
 	
 		return SafeHomeServer.ERROR_ANSWER;

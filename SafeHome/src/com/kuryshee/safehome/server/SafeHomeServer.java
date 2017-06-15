@@ -87,6 +87,11 @@ public class SafeHomeServer extends HttpServlet {
     public static final String REQ_LOGIN = "/login";
     
     /**
+     * The constant for requesting data about Raspberry Pi usage history.
+     */
+    public static final String REQ_HISTORY = "/history";
+    
+    /**
      * The definition of the answer when no data are available.
      */
     public static final String NO_ANSWER = "no answer";
