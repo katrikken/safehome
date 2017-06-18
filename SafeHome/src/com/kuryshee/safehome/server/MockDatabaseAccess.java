@@ -4,12 +4,22 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import com.kuryshee.safehome.database.DatabaseAccessInterface;
 
+/**
+ * This class implements the mock database access.
+ * It writes information to the files instead of writing to the actual database.
+ * @author Ekaterina Kurysheva
+ */
 public class MockDatabaseAccess implements DatabaseAccessInterface{
+	
+	public static String DB_PATH = "Database\\";
+	
+	public static final String LIST = "list";
 
 	@Override
 	public Boolean connect(String url, Map<String, String> properties) {
@@ -22,10 +32,11 @@ public class MockDatabaseAccess implements DatabaseAccessInterface{
 		String command = values.get(SafeHomeServer.COMMAND_PARAM);
 		String time = values.get(SafeHomeServer.TIME_PARAM);
 		if (id != null){
-			try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(id, true)))){
+			try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(DB_PATH + id, true)));
+					PrintWriter out_p = new PrintWriter(new BufferedWriter(new FileWriter(DB_PATH + id + LIST, true)))){
 				if(command != null){
 					if(time != null){
-						out.print(time + " ");
+						out.print(time.trim() + " ");
 					}
 					
 					if(command.equals(SafeHomeServer.REQ_MOTIONDETECTED)){
@@ -48,6 +59,7 @@ public class MockDatabaseAccess implements DatabaseAccessInterface{
 						String path = values.get(SafeHomeServer.PHOTO_PARAM);
 						if(path != null){
 							out.print(path + " ");
+							out_p.println(path);
 						}
 						out.println("Photo was saved.");
 						return true;
@@ -59,11 +71,14 @@ public class MockDatabaseAccess implements DatabaseAccessInterface{
 		}
 		return false;
 	}
-
+	
 	@Override
-	public Boolean close() {
-		// TODO Auto-generated method stub
+	public ResultSet select(String query) {
 		return null;
 	}
 
+	@Override
+	public Boolean close() {
+		return true;
+	}
 }
