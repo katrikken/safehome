@@ -15,6 +15,9 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextAttributeEvent;
+import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.annotation.WebListener;
 
 import com.kuryshee.safehome.sanitizer.Sanitizer;
 
@@ -155,4 +158,6 @@ public class NewUserPage implements Serializable{
 		
 		return "newuser";
 	}
+	
+	
 }

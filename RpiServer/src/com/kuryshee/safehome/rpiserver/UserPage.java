@@ -11,16 +11,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
+import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 /**
  * This class implements managed bean for the page with user management logic.
  * @author Ekaterina Kurysheva
  */
 @ManagedBean(name="userPage")
-@RequestScoped
+@ViewScoped
 public class UserPage implements Serializable {
 	
 	/**
@@ -46,6 +50,24 @@ public class UserPage implements Serializable {
 	public void setUserName(String userName) {	
 		this.userName = userName;
 	}
+	
+	private UIComponent errorMsgComponent;
+	
+	/**
+	 * Getter for the property errorMsgComponent where {@link FacesMessage} is displayed.
+	 * @return the component for error messages.
+	 */
+    public UIComponent getErrorMsgComponent() {
+        return errorMsgComponent;
+    }
+
+    /**
+     * Setter for the property errorMsgComponent.
+     * @param errorMsgComponent is the component to display messages in.
+     */
+    public void setErrorMsgComponent(UIComponent errorMsgComponent) {
+        this.errorMsgComponent = errorMsgComponent;
+    }
 
 	/**
 	 * Getter for the property userBeans.
@@ -116,10 +138,34 @@ public class UserPage implements Serializable {
 	/**
 	 * This method redirects to a page, where new user can be registered.
 	 * It signalizes to the servlet about upcoming task of fetching data from the logic part.
-	 * @return newuser page
+	 * @return newuser page or null in case new user yet cannot be registered.
 	 */
-	public String createUser(){
-		RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
-		return "newuser";
+	public String createUser(){		
+		try{
+			//Check if the tag is known
+			ServletContext servletContext = 
+				(ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+			
+			String key = servletContext.getAttribute(RpiServlet.CARD_PARAM).toString();
+
+			//If the tag is not present
+			if(!key.equals(RpiServlet.ERROR_ANSWER)){
+				return "newuser";			
+			}	
+		}
+		catch(Exception ex){
+			Logger.getLogger("UserPage").log(Level.SEVERE, ex.getMessage());
+		}		
+		
+		//Show the message
+		FacesContext.getCurrentInstance().addMessage(
+				errorMsgComponent.getClientId(), 
+				new FacesMessage("Put the new token to the reader and press the button again!"));
+		//Check whether the task has been set
+		if(!RpiServlet.tasks.contains(RpiServlet.COMMAND_READTOKEN)){
+			RpiServlet.tasks.add(RpiServlet.COMMAND_READTOKEN);
+		}
+		
+		return null;
 	}
 }
