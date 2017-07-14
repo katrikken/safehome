@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class implements the custom thread.
+ * Class implements the custom thread.
  * It communicates with the main server and passes the answers to the other parts of the application.
  * @author Ekaterina Kurysheva
  */
@@ -78,7 +78,7 @@ public class ServerChecker extends Thread{
     
 
     /**
-     * This method uploads photos to the server.
+     * Uploads photos to the server in a POST request.
      * @return true if the photo was successfully sent.
      */
     private Boolean uploadPhoto(){
@@ -112,7 +112,7 @@ public class ServerChecker extends Thread{
     }
     
     /**
-     * This method uploads information about switching the state of a program by a token.
+     * Uploads information about switching the state of a program by a token in a POST request.
      * @param info contains data about the registered token.
      * @return true if the request was successfully sent.
      */
@@ -142,7 +142,7 @@ public class ServerChecker extends Thread{
     }
     
     /**
-     * This method sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
+     * Sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
      */
     private void sendCheckTask(){
         String query;
@@ -160,7 +160,7 @@ public class ServerChecker extends Thread{
     }
     
     /**
-    * This method uses utility class {@link GetRequestSender} to send GET request
+    * Sends GET request to the server.
     * @param request is a string to add to the server address.
     * The method stores the answer in the queue for inside tasks in {@link #insideTasks}.
     * @return true if the request was successfully sent.
@@ -193,7 +193,7 @@ public class ServerChecker extends Thread{
     }
     
     /**
-     * This method repeatedly checks for the requests to send to the main server. 
+     * Checks for the queue of requests to send in a continuous loop. 
      */
     @Override
     public void run(){

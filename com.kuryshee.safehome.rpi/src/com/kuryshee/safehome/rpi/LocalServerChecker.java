@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class implements the custom thread.
+ * Class implements the custom thread.
  * It communicates with the local server and passes the answers to the other parts of the application.
  * @author Ekaterina Kurysheva
  */
@@ -54,7 +54,7 @@ public class LocalServerChecker extends Thread{
     private static final Logger LOGGER = Logger.getLogger("Local server checker");
     
     /**
-     * This method sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
+     * Sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
      */
     private void sendCheckTask(){
         String query;
@@ -72,7 +72,7 @@ public class LocalServerChecker extends Thread{
     }
     
     /**
-     * This method sends card ID read by RFID thread to local server as a POST request.
+     * Sends card tag read by RFID thread to local server as a POST request.
      */
     private void sendCardID(){
         FormUploader uploader;
@@ -94,9 +94,9 @@ public class LocalServerChecker extends Thread{
     }
     
     /**
-    * This method uses utility class {@link GetRequestSender} to send GET request
+    * Sends GET request to the local server.
     * @param request is a string to add to the server address.
-    * The method stores the answer in the queue for inside tasks in {@link #insideTasks}.
+    * Stores the answer in the queue for inside tasks in {@link #insideTasks}.
     * @return true if the request was successfully sent.
     */
     public static Boolean sendGETRequest(String request){      
@@ -127,7 +127,7 @@ public class LocalServerChecker extends Thread{
     }
     
     /**
-     * This method contains the infinite loop in which it tries to get the task from the server.
+     * Asks the server for tasks in a continuous loop.
      */
     @Override
     public void run(){

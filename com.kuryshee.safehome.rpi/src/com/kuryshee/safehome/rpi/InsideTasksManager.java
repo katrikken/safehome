@@ -7,20 +7,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class implements managing the inside logic of the application.
+ * Class implements managing the inside logic of the application.
  * @author Ekaterina Kurysheva
  */
 public class InsideTasksManager extends Thread{
     
     /**
-     * The constant of one second (in milliseconds).
+     * The constant of one second in milliseconds.
      */
     private long ONE_SEC = 1000;
     
     private static final Logger LOGGER = Logger.getLogger("RPi");
     
     /**
-     * This method processes the tasks arriving from other logical parts of the application.
+     * Processes the tasks arriving from other logical parts of the application.
      * @param task specifies the task.
      */
     private void processTask(String task){
@@ -43,7 +43,7 @@ public class InsideTasksManager extends Thread{
     }
     
     /**
-     * This method creates program status update request for the server.
+     * Creates program status update request for the server.
      */
     private void getstateTask(){
         Map<String, String> atts = new HashMap<>();
@@ -56,28 +56,28 @@ public class InsideTasksManager extends Thread{
     }
     
     /**
-     * This method sets the current program mode to "ON".
+     * Sets the current program mode to "ON".
      */
     private void switchOn() {
         Main.motionController.switchOn();
     }
         
     /**
-     * This method sets the current program mode to "OFF".
+     * Sets the current program mode to "OFF".
      */
     private void switchOff(){
         Main.motionController.switchOff();
     }
     
     /**
-     * This method invokes a function on {@link MotionController} instance to take a new photo.
+     * Invokes a function on {@link MotionController} instance to take a new photo.
      */
     private void takePhoto(){
         Main.motionController.takePhoto();
     }
     
     /**
-     * This method passes the tasks to the {@link MotionController} and {@link RFIDController} to start reading new token.
+     * Passes the tasks to the {@link MotionController} and {@link RFIDController} to start reading new token.
      * @param command is a task to pass to the {@link RFIDController}.
      */
     private void readNewCard(String command){
@@ -86,7 +86,7 @@ public class InsideTasksManager extends Thread{
     }
     
     /**
-     * This method invokes a function on {@link RFIDController} instance to update the information about registered tokens.
+     * Invokes a function on {@link RFIDController} instance to update the information about registered tokens.
      * @param command is a task to pass to the {@link RFIDController}.
      */
     private void rereadUserConfiguration(String command){
@@ -94,7 +94,7 @@ public class InsideTasksManager extends Thread{
     }
     
     /**
-     * This method switches the program mode upon the reading of a known RFID token.
+     * Method switches the program mode upon the reading of a known RFID token.
      */
     private void rfidSwitch(){
         if (Main.motionController.isON()){
@@ -106,7 +106,7 @@ public class InsideTasksManager extends Thread{
     }
     
     /**
-     * The thread repeatedly checks if any task has arrived.
+     * Checks if any task has arrived in a continuous loop.
      */
     @Override
     public void run(){

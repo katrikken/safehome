@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class initializes program threads and sets the configuration of the application.
+ * Class initializes program threads and sets the configuration of the application.
  * @author Ekaterina Kurysheva
  */
 public class Main {
@@ -63,27 +63,27 @@ public class Main {
     private static final String KEYWORD_DELIM = "=";
     
     /**
-     * This queue contains strings with tasks which should be processed by the {@link ServerChecker}.
+     * Queue of strings with tasks which should be processed by the {@link ServerChecker}.
      */
     public static ConcurrentLinkedQueue<String> forServer = new ConcurrentLinkedQueue<>();
     
     /**
-     * This queue contains strings with tasks which should be processed by the {@link InsideTasksManager}.
+     * Queue of strings with tasks which should be processed by the {@link InsideTasksManager}.
      */
     public static ConcurrentLinkedQueue<String> insideTasks = new ConcurrentLinkedQueue<>();
     
     /**
-     * This queue contains strings with tasks which should be processed by the {@link RFIDController}.
+     * Queue of strings with tasks which should be processed by the {@link RFIDController}.
      */
     public static ConcurrentLinkedQueue<String> forRFID = new ConcurrentLinkedQueue<>();
     
     /**
-     * This queue contains strings with tasks which should be processed by the {@link LocalServerChecker}.
+     * Queue of strings with tasks which should be processed by the {@link LocalServerChecker}.
      */
     public static ConcurrentLinkedQueue<String> forLocalServer = new ConcurrentLinkedQueue<>();
     
     /**
-     * This queue contains strings with photo paths which should be processed by the {@link ServerChecker}.
+     * Queue of strings with photo paths which should be processed by the {@link ServerChecker}.
      */
     public static ConcurrentLinkedQueue<String> photoPaths = new ConcurrentLinkedQueue<>();
     
@@ -95,7 +95,7 @@ public class Main {
     private static final Logger LOGGER = Logger.getLogger("RPi");
     
     /**
-     * This method reads the program configuration file and sets variables {@link #serverAddress},  
+     * Reads the program configuration file and sets variables {@link #serverAddress},  
      * {@link #localServerAddress}, {@link #id}, {@link #photoDir}.
      */
     private static void readConfigurations(){
@@ -131,7 +131,7 @@ public class Main {
     }
 
     /**
-     * This method ensures that the configuration file for tokens exists.
+     * Ensures that the configuration file for tokens exists.
      */
     private static void createTokenConfig(){
         try {
@@ -146,8 +146,8 @@ public class Main {
     }
     
     /**
-     * This method is an entry point of a program.
-     * It initializes and starts working threads.
+     * The entry point of the program.
+     * Initializes and starts working threads.
      * @param args command line arguments
      */
     public static void main(String[] args) {     
