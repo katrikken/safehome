@@ -47,13 +47,13 @@ public class Main {
     /**
      * The path to the configuration file with information about registered users.
      */
-    public static final String CONFIG_KEYSFILE = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/keys.txt";
+    public static String CONFIG_KEYSFILE = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/keys.txt";
     
     /**
      * The path to the configuration file with definitions of variables 
      * {@link #id}, {@link #localServerAddress}, {@link #photoDir}, {@link #serverAddress}.
      */
-    private static final String CONFIG_MAINFILE = "/home/pi/NetBeansProjects/com.kuryshee.safehome.rpi/dist/config.txt";;
+    private static String CONFIG_MAINFILE;
     
     //Theese are key words for reading configuration files.
     private static final String KEYWORD_SERVER = "server";
@@ -103,25 +103,29 @@ public class Main {
             String conf;
             while((conf = br.readLine()) != null){
 		if(!conf.trim().isEmpty()){
-                    if (conf.startsWith(KEYWORD_SERVER)){        
-                        serverAddress = conf.split(KEYWORD_DELIM)[1];
-                        
-                        LOGGER.log(Level.CONFIG, "--Config: server address == {0}", serverAddress);
-                    }
-                    else if(conf.startsWith(KEYWORD_MYID)){
-                        id = conf.split(KEYWORD_DELIM)[1];
-                        
-                        LOGGER.log(Level.CONFIG, "--Config: id == {0}", id);
-                    }
-                    else if(conf.startsWith(KEYWORD_PHOTO)){
-                        photoDir = conf.split(KEYWORD_DELIM)[1];
-                        
-                        LOGGER.log(Level.CONFIG, "--Config: photo path == {0}", photoDir);
-                    }
-                    else if(conf.startsWith(KEYWORD_LOCSERVER)){
-                        localServerAddress = conf.split(KEYWORD_DELIM)[1];
-                        
-                        LOGGER.log(Level.CONFIG, "--Config: local server == {0}", localServerAddress);
+                    String[] args = conf.split(KEYWORD_DELIM);
+                    
+                    if(args.length == 2){
+                        if (args[0].equals(KEYWORD_SERVER)){        
+                            serverAddress = args[1];
+
+                            LOGGER.log(Level.CONFIG, "--Config: server address == {0}", serverAddress);
+                        }
+                        else if(args[0].equals(KEYWORD_MYID)){
+                            id = args[1];
+
+                            LOGGER.log(Level.CONFIG, "--Config: id == {0}", id);
+                        }
+                        else if(args[0].equals(KEYWORD_PHOTO)){
+                            photoDir = args[1];
+
+                            LOGGER.log(Level.CONFIG, "--Config: photo path == {0}", photoDir);
+                        }
+                        else if(args[0].equals(KEYWORD_LOCSERVER)){
+                            localServerAddress = args[1];
+
+                            LOGGER.log(Level.CONFIG, "--Config: local server == {0}", localServerAddress);
+                        }
                     }
 		}
             }	
@@ -151,25 +155,30 @@ public class Main {
      * @param args command line arguments
      */
     public static void main(String[] args) {     
-        readConfigurations();
-        createTokenConfig();
-
-        RFIDController rfidThread = new RFIDController();  
-        motionController= new MotionController();
-        InsideTasksManager manager = new InsideTasksManager();
-        ServerChecker requestThread = new ServerChecker();
-        LocalServerChecker localChecker = new LocalServerChecker();
-       
-        LOGGER.log(Level.INFO, "--Starting thread for rfid");
-        rfidThread.start();
+        if(args.length == 2){
+            CONFIG_MAINFILE = args[0];
+            CONFIG_KEYSFILE = args[1];
         
-        LOGGER.log(Level.INFO, "--Starting thread for inside tasks manager");
-        manager.start();
-            
-        LOGGER.log(Level.INFO, "--Starting thread for server");
-        requestThread.start();
-       
-        LOGGER.log(Level.INFO, "--Starting thread for local server");
-        localChecker.start();     
+            readConfigurations();
+            createTokenConfig();
+
+            RFIDController rfidThread = new RFIDController();  
+            motionController= new MotionController();
+            InsideTasksManager manager = new InsideTasksManager();
+            ServerChecker requestThread = new ServerChecker();
+            LocalServerChecker localChecker = new LocalServerChecker();
+
+            LOGGER.log(Level.INFO, "--Starting thread for rfid");
+            rfidThread.start();
+
+            LOGGER.log(Level.INFO, "--Starting thread for inside tasks manager");
+            manager.start();
+
+            LOGGER.log(Level.INFO, "--Starting thread for server");
+            requestThread.start();
+
+            LOGGER.log(Level.INFO, "--Starting thread for local server");
+            localChecker.start();   
+        }
     }    
 }
