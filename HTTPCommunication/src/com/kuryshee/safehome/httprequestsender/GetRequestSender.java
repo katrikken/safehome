@@ -29,6 +29,8 @@ public class GetRequestSender {
      * In case error occurred, returns {@link AnswerConstants#ERROR_ANSWER}.
      */
     public String connect(String query, String charset){
+        if(charset == null) charset = "UTF-8";
+        
         try{
             URL url = new URL(query);
         
