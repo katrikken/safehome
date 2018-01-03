@@ -52,6 +52,8 @@ public class LocalServerChecker extends Thread{
     private long FIVE_SEC = 5000;
     
     private static final Logger LOGGER = Logger.getLogger("Local server checker");
+
+    private static GetRequestSender sender = new GetRequestSender();
     
     /**
      * Sends the GET request to a {@link #REQ_CHECKTASK} address on the server. 
@@ -100,12 +102,11 @@ public class LocalServerChecker extends Thread{
     * @return true if the request was successfully sent.
     */
     public static Boolean sendGETRequest(String request){      
-        GetRequestSender sender = null;
         try{
-            sender = new GetRequestSender(Main.localServerAddress + request, Main.DEFAULT_ENCODING);
             LOGGER.log(Level.INFO, "-- Send request " + request + " to " + Main.localServerAddress); 
             
-            String answer = sender.connect();
+            String answer = sender.connect(Main.localServerAddress + request, Main.DEFAULT_ENCODING);
+            
 
             LOGGER.log(Level.INFO, "-- Answer: ", answer); 
             if(!answer.equals(AnswerConstants.NO_ANSWER) && !answer.equals(AnswerConstants.ERROR_ANSWER)){
@@ -117,11 +118,6 @@ public class LocalServerChecker extends Thread{
         }
         catch(Exception e){ 
             LOGGER.log(Level.SEVERE, "-- Sending GET request to {0} failed", Main.localServerAddress); 
-        }
-        finally{
-            if (sender != null){
-                sender.finish();
-            }
         }
         return false;
     }

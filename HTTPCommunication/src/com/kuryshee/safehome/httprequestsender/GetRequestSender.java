@@ -18,65 +18,60 @@ import java.util.logging.Logger;
 public class GetRequestSender {
 
     private HttpURLConnection connection;
-    private String charset;
-    private int TEN_SEC = 10000;
-    
-    /**
-     * This constructor creates a new instance of {@link HttpURLConnection} class to form a GET request.
-     * @param query is a full URL address to set the connection.
-     * @param charset defines the encoding for the request.
-     * @throws IOException
-     */
-    public GetRequestSender(String query, String charset) throws IOException{
-        this.charset = charset;
-        URL url = new URL(query);
-        connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setDoInput(true);
-        connection.setRequestProperty("Accept-Charset", charset);                
-        connection.setConnectTimeout(TEN_SEC); 
-    }
+    private final int TEN_SEC = 10000;
     
     /**
      * This method connects to the server and tries to get the answer.
+     * @param query is a full URL address to set the connection.
+     * @param charset defines the encoding for the request.
      * @return string with answer. 
-     * In case no answer arrived, returns {@link Main#NO_ANSWER}.
-     * In case error occurred, returns {@link Main#ERROR_ANSWER}.
-     * @throws IOException 
+     * In case no answer arrived, returns {@link AnswerConstants#NO_ANSWER}.
+     * In case error occurred, returns {@link AnswerConstants#ERROR_ANSWER}.
      */
-    public String connect() throws IOException{
-        connection.connect();
-        try(BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), charset))){     
-            for (int i = 0; i < 10; i++){  
-                if(reader != null){
-                    String answer = reader.readLine();
-                    if(answer != null)
-                        return answer;
+    public String connect(String query, String charset){
+        try{
+            URL url = new URL(query);
+        
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setDoInput(true);
+            connection.setRequestProperty("Accept-Charset", charset);                
+            connection.setConnectTimeout(TEN_SEC); 
+            connection.connect();
+            try(BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), charset))){     
+                for (int i = 0; i < 10; i++){  
+                    if(reader != null){
+                        String answer = reader.readLine();
+                        if(answer != null)
+                            return answer;
+                    }
+                    else{            
+                        try{ Thread.sleep(100); }
+                        catch(InterruptedException e){ //log 
+                            return AnswerConstants.ERROR_ANSWER;
+                        }               
+                    }
                 }
-                else{            
-                    try{ Thread.sleep(100); }
-                    catch(InterruptedException e){ //log 
-                        return AnswerConstants.ERROR_ANSWER;
-                    }               
+
+                return AnswerConstants.NO_ANSWER;                      
+            }
+            catch(IOException e){
+                Logger.getLogger("Sending GET request").log(Level.SEVERE, e.getMessage());    
+                return AnswerConstants.ERROR_ANSWER;
+            }
+            finally{
+                if (connection != null){
+                    connection.disconnect();
                 }
             }
-            
-            return AnswerConstants.NO_ANSWER;                      
         }
         catch(IOException e){
+            Logger.getLogger("Sending GET request").log(Level.SEVERE, e.getMessage());    
             return AnswerConstants.ERROR_ANSWER;
         }
     }   
-    
-    /**
-     * This method finishes the connection.
-     */
-    public void finish(){
-        if (connection != null){
-            connection.disconnect();
-        }
-    }
+   
     
     /**
      * This method encodes the query to the URL format.

@@ -76,6 +76,8 @@ public class ServerChecker extends Thread{
     
     private static final Logger LOGGER = Logger.getLogger("Server Check");
     
+    private static GetRequestSender sender = new GetRequestSender();
+    
 
     /**
      * Uploads photos to the server in a POST request.
@@ -166,12 +168,10 @@ public class ServerChecker extends Thread{
     * @return true if the request was successfully sent.
     */
     public static Boolean sendGETRequest(String request){      
-        GetRequestSender sender = null;
         try{
-            sender = new GetRequestSender(Main.serverAddress  + request, Main.DEFAULT_ENCODING);
             LOGGER.log(Level.INFO, "-- Send request " + request + " to " + Main.serverAddress ); 
             
-            String answer = sender.connect();
+            String answer = sender.connect(Main.serverAddress  + request, Main.DEFAULT_ENCODING);
 
             LOGGER.log(Level.INFO, "-- Answer: ", answer); 
             if(!answer.equals(AnswerConstants.NO_ANSWER) && !answer.equals(AnswerConstants.ERROR_ANSWER)){
@@ -183,11 +183,6 @@ public class ServerChecker extends Thread{
         }
         catch(Exception e){ 
             LOGGER.log(Level.SEVERE, "-- Sending GET request to {0} failed", Main.serverAddress); 
-        }
-        finally{
-            if (sender != null){
-                sender.finish();
-            }
         }
         return false;
     }

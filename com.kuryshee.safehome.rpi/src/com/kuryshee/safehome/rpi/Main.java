@@ -180,5 +180,8 @@ public class Main {
             LOGGER.log(Level.INFO, "--Starting thread for local server");
             localChecker.start();   
         }
+        else{
+            LOGGER.log(Level.INFO, "Missing arguments for \"configuration\" and \"keys\"");
+        }
     }    
 }
