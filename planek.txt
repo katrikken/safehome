@@ -16,10 +16,12 @@ Analysis 
 
 Solution
  
--architecture description
+-architecture description module by module
+-considered options with pros and cons
 -logic of architecture modules
 -architecture reasoning
--hardware and software choosing reasoning
+-implementation options discussion
+-software choosing reasoning
 
 Evaluation
 -which obstacles were on the way and how it influenced architecture 
