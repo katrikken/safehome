@@ -1,4 +1,0 @@
-server=http://192.168.0.16:8080/SafeHome/SafeHomeServer/rpi
-myID=rpi
-photo=/home/pi/Pictures
-locserver=http://localhost:8080/RpiServer/RpiServlet
