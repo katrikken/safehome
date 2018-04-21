@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      >
+
+	<h:head>
+		<meta charset="utf-8"></meta>
+	    <title>Safe Home</title>
+	    <h:outputStylesheet library="css" name="style.css" />
+	</h:head> 
+	<body> 
+		<div class="title">
+	        <h1>Safe Home Application</h1>     
+	        <span>You are logged as #{userPage.userName}</span>
+	    </div>
+	    <div class="module form-module">
+			<div class="form">
+				<h2>List of users</h2>
+				<h:form>
+		        <table border="0">        
+		        	<ui:repeat var="i" value="#{userPage.userBeans}">
+	 					<tr>
+	 						<td><h:outputText value="#{i.name}"/></td>
+	 						<td>
+	 							<h:commandButton 
+	 								value="Change password" 
+	 								action="#{userPage.changePassword(i)}"
+	 								class="delete-button"/>
+	 						</td>
+	 						<td>
+	 							<h:commandButton 
+	 								value="Delete" 
+	 								action="#{userPage.deleteUser(i)}"
+	 								onclick="return confirm('Are you sure?')"
+	 								class="delete-button"/>
+	 						</td>
+	 					</tr>
+					</ui:repeat>      
+		        </table>    
+		        <br/>
+		        <h:commandButton 
+		        	value="Add new user" 
+		        	action="#{userPage.createUser()}"
+		        	class="button"
+		        	id="redirect"
+					binding="#{userPage.errorMsgComponent}"/> 
+				<h:message 
+					class="error" 
+				    for="redirect" 
+				    id="redirectError" /> 
+	        </h:form>      
+			</div>
+		</div>
+	</body> 
+</html>
