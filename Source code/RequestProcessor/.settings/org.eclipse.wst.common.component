@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="RequestProcessor">
+        <wb-resource deploy-path="/" source-path="/src"/>
+        <dependent-module archiveName="org.apache.commons.io.jar" deploy-path="/" handle="module:/classpath/lib/C:/Users/Katrikken.Lenovo-PC/Documents/Oracle/org.apache.commons.io.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="javax.json-1.0.jar" deploy-path="/" handle="module:/classpath/lib/C:/Users/Katrikken.Lenovo-PC/Documents/Oracle/javax.json-1.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+    </wb-module>
+</project-modules>
