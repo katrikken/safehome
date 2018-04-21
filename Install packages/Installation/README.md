@@ -1,87 +1,53 @@
 # Safe Home Raspberry Pi module
 
-Safe Home is a project for the bachalor thesis "Home alarm system". This part of the project is a Raspberry Pi security module, which is responsible for motion detection, taking pictures and 
+Safe Home is an application for the bachelor thesis "Home alarm system". This part of the project is a Raspberry Pi security module, which is responsible for motion detection, taking pictures and registering RFID cards.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Download installation package for Safe Home from https://github.com/katrikken/safehome.git
+Follow the instructions in this README.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+To run Safe Home security module on Raspberry Pi, you will need:
 
-```
-Give examples
-```
+1) Raspberry Pi computer model B or newer compatible with model B with the installed Raspbian operating system. Look at the "User guide.doc" for detailed instructions on how to set up your Raspberry Pi or at https://www.raspberrypi.org/
+2) A MIFARE RFID-RC522 card reader.
+3) A PIR motion sensor.
+4) A USB camera.
+5) A LED.
+6) A 330-ohm resistor.
+7) Breadboard and Male-Female jumper wires.
+8) An Ethernet cable.
+9) A micro-USB cable.
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
+Make sure your Raspberry Pi is properly set up by checking up with the "User guide.doc".
 
-Say what the step will be
+Connect the hardware elements to the Raspberry Pi following the scheme illustrated in "Raspberry Pi circuit scheme.jpg" file.
 
-```
-Give the example
-```
+Connect Raspberry Pi to the Internet via Ethernet cable. Connect it to the power supply via micro-USB cable.
 
-And repeat
+Connect to the Raspberry Pi via WinSCP or similar program, allowing you to copy files to your Raspberry Pi. Copy folder "Installation" to the "/home/pi/" directory.
 
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+The installation process can take up to several hours to finish. The longest part of the installation is updating Raspbian software. You can avoid this longevity by running following commands before the security module installation:
 
 ```
-Give an example
+sudo apt-get update -y
+sudo apt-get dist-upgrade -y 
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
+On Raspberry Pi terminal (via "putty", for example) run commands: 
 
 ```
-Give an example
+cd Installation
+chmod +x install.sh
+./install.sh 
 ```
 
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+When the script has finished, shut down your Raspberry Pi and turn it on again. Within a couple of minutes, the LED will blink three times. This will mean that installation finished correctly and the security module is ready to work.
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* **Ekaterina Kurysheva** (https://github.com/katrikken)
