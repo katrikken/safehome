@@ -25,7 +25,7 @@ To run Safe Home security module on Raspberry Pi, you will need:
 
 Make sure your Raspberry Pi is properly set up by checking up with the "User guide.doc".
 
-Connect the hardware elements to the Raspberry Pi following the scheme illustrated in "Raspberry Pi circuit scheme.jpg" file.
+Connect the hardware elements to the Raspberry Pi following the scheme illustrated in "Raspberry Pi circuit scheme.png" file.
 
 Connect Raspberry Pi to the Internet via Ethernet cable. Connect it to the power supply via micro-USB cable.
 
