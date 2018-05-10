@@ -15,11 +15,11 @@
 case "$1" in 
     start)
         echo "Starting safehome"
-	/home/pi/safehomestart.sh
+	/home/pi/Installation/safehomestart.sh
         ;;
     stop)
         echo "Stopping safehome"
-        /home/pi/safehomestop.sh
+        /home/pi/Installation/safehomestop.sh
         ;;
     *)
         echo "Usage: /etc/init.d/safehome start|stop"
