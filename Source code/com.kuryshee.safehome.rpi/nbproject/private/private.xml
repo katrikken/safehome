@@ -3,7 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/UserManager.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/Main.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/ServerChecker.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/package-info.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/UserBean.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/MotionController.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/RFIDController.java</file>
             <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/InsideTasksManager.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/UserComparator.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/LocalServerChecker.java</file>
+            <file>file:/C:/Users/Katrikken.Lenovo-PC/Documents/NetBeansProjects/com.kuryshee.safehome.rpi/src/com/kuryshee/safehome/rpi/Reporter.java</file>
         </group>
     </open-files>
 </project-private>

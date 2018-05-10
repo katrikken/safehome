@@ -128,7 +128,7 @@ public class ServerChecker extends Thread{
     /**
     * Sends GET request to the server.
     * @param request is a string to add to the server address.
-    * The method stores the answer in the queue for inside tasks in {@link #insideTasks}.
+    * The method stores the answer in the queue for inside tasks in {@link Main#insideTasks}.
     * @return true if the request was successfully sent.
     */
     public static Boolean sendGETRequest(String request){      

@@ -90,8 +90,8 @@ public class RFIDController extends Thread{
             }
             else{
                 Main.forLocalServer.add(RpiCommunicationConsts.COMMAND_READTOKEN + token);
+                Main.insideTasks.add(InsideTasksManager.BLINK);
             }
-            Main.insideTasks.add(InsideTasksManager.BLINK);
         }
         else{
             Main.forLocalServer.add(RpiCommunicationConsts.COMMAND_READTOKEN + AnswerConstants.ERROR_ANSWER);

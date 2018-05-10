@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="dist/lib"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/RequestProcessor"/>
+	<classpathentry kind="lib" path="dist/lib/javax.json-1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/pi4j"/>
+	<classpathentry kind="lib" path="dist/lib/org.apache.commons.io.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

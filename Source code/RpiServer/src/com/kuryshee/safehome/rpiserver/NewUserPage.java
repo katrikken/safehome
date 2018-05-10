@@ -206,9 +206,7 @@ public class NewUserPage implements Serializable{
 	 */
 	private void saveChanges(UserConfigManager reader, List<UserBean> beans){
 		reader.writeBeansToJson(beans);
-		if(!RpiServlet.tasks.contains(RpiCommunicationConsts.COMMAND_UPDATEUSERS)){
-			RpiServlet.tasks.add(RpiCommunicationConsts.COMMAND_UPDATEUSERS);
-		}
+		RpiServlet.tasks.add(RpiCommunicationConsts.COMMAND_UPDATEUSERS);
 	}
 	
 	 /**

@@ -51,7 +51,7 @@ public final class MotionController{
     private GpioInterruptListener listener;
     
     /**
-     * Getter for the property {@link #ON).
+     * Getter for the property {@link #ON}.
      * @return true if the state of the program is "ON".
      */
     public boolean isON() {
