@@ -11,7 +11,7 @@ Follow the instructions in this README.
 
 To run Safe Home security module on Raspberry Pi, you will need:
 
-1) Raspberry Pi computer model B or newer compatible with model B with the installed Raspbian operating system. Look at the "User guide.doc" for detailed instructions on how to set up your Raspberry Pi or at https://www.raspberrypi.org/
+1) Raspberry Pi computer model B or newer compatible with model B with the installed Raspbian operating system. Look at the "User manual.doc" for detailed instructions on how to set up your Raspberry Pi or at https://www.raspberrypi.org/
 2) A MIFARE RFID-RC522 card reader.
 3) A PIR motion sensor.
 4) A USB camera.
