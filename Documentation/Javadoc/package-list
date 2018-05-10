@@ -1,0 +1,10 @@
+com.kuryshee.safehome.appcommunicationconsts
+com.kuryshee.safehome.database
+com.kuryshee.safehome.httprequestsender
+com.kuryshee.safehome.requestdataretriever
+com.kuryshee.safehome.requestprocessorinterface
+com.kuryshee.safehome.rpi
+com.kuryshee.safehome.rpicommunicationconsts
+com.kuryshee.safehome.rpiserver
+com.kuryshee.safehome.sanitizer
+com.kuryshee.safehome.server
