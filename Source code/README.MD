@@ -17,7 +17,7 @@ To compile Safe Home, you need to have installed:
 3) Oracle database
 4) Android Studio 3.0.1 or higher
 
-### Compillation
+### Compilation
 
 1) Import the projects RpiServer and SafeHome to Eclipse IDE as Java dynamic web applications.
 2) Import the com.kuryshee.safehome.rpi and RequestProcessor as existing projects to Eclipse IDE.
@@ -34,9 +34,9 @@ Now Eclipse IDE will be able to build from the source code.
 
 In Android Studio:
 1) Configure dependencies by adding the .jar files from the "https://github.com/katrikken/safehome/tree/master/Source%20code/SafeHomeClient/app/libs" folder. 
-2) Build the project wigh Gradle build.
+2) Build the project with Gradle builds.
 
-Now you have compiled Android application for the project.
+Now you have compiled the Android application for the project.
 
 ## Authors
 
