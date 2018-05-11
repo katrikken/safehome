@@ -19,7 +19,7 @@ For the full list of prerequisites for Raspberry Pi security module, check the R
 
 ### Installing
 
-## Server installation
+#### Server installation
 
 In your Oracle database create a "safehome" user running the following script:
 
@@ -37,7 +37,7 @@ insert_data.sql
 
 Deploy the "SafeHome.war" on your Tomcat server.
 
-## Android application installation
+#### Android application installation
 
 Install the "app-debug.apk" on your Android device.
 
