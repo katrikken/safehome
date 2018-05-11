@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Safe Home</string>
+
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="log_in">Log in</string>
+    <string name="connect">Connect</string>
+    <string name="enter_server_hint">Enter server address</string>
+    <string name="try_again">Try again</string>
+    <string name="turn_on">Turn on</string>
+    <string name="turn_off">Turn off</string>
+    <string name="bn_events">Events</string>
+    <string name="bn_photo">Take photo</string>
+    <string name="bn_gallery">Gallery</string>
+    <string name="server_not_resp">Server is not responding.</string>
+    <string name="auth_failed">We could not authorize you. Is the password correct?</string>
+    <string name="invalid_input">Invalid input!</string>
+
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

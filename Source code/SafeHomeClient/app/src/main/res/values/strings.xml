@@ -1,0 +1,12 @@
+<resources>
+    <string name="photo_format">.jpg</string>
+    <string name="image_dir">Images</string>
+    <string name="channel_name">Safe Home</string>
+    <string name="channel_description">Safe Home notification</string>
+    <string name="network_error">Connect to the Internet and try again.</string>
+    <string name="error">Error</string>
+    <string name="invalid_user_input">Invalid input!</string>
+    <string name="notif_title">Intrusion!</string>
+    <string name="notif_login">Please log in to the application.</string>
+    <string name="notif_login_title">You have been logged out!</string>
+</resources>
