@@ -11,11 +11,11 @@ The Javadoc folder contains the rest of the Java code documentation for the proj
 
 In the generated documentation you will find the description of the following packages.
 
-**com.kuryshee.safehome.rpi** package contains the classes for the Raspberry Pi security module, which controls the hardware on the computer.
-**RpiServer** package contains the classes of the web application for user management on Raspberry Pi.
-**SafeHome** package contains the classes of the server, which stores and shares the data between the Raspberry Pi security module and the mobile application.
-**SafeHomeClient** package contains the classes of the Android application for browsing the data from the Raspberry Pi security module and delivering the notifications about the intrusions. 
-**RequestProcessor** package contains supporting library for HTTP requests processing, which other packages actively use.
+* **com.kuryshee.safehome.rpi** package contains the classes for the Raspberry Pi security module, which controls the hardware on the computer.
+* **RpiServer** package contains the classes of the web application for user management on Raspberry Pi.
+* **SafeHome** package contains the classes of the server, which stores and shares the data between the Raspberry Pi security module and the mobile application.
+* **SafeHomeClient** package contains the classes of the Android application for browsing the data from the Raspberry Pi security module and delivering the notifications about the intrusions. 
+* **RequestProcessor** package contains supporting library for HTTP requests processing, which other packages actively use.
 
 ## Authors
 
