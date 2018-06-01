@@ -89,9 +89,9 @@ public class MainActivity extends AppCompatActivity {
 
         setNormalState();
 
-        readCache();
-
         setStringCache();
+
+        readCache();
 
         if(((GlobalVariables) application).getServerPath() == null){
             readConfigurations();
@@ -188,10 +188,10 @@ public class MainActivity extends AppCompatActivity {
                     JsonObject object = reader.readObject();
 
                     Set<String> keySet = object.keySet();
-                    if(keySet.contains(AppConstants.SERVER_ADDRESS)){
+                    if(keySet.contains(AppConstants.SERVER_ADDRESS) && ((GlobalVariables) application).getServerPath() == null){
                         ((GlobalVariables) application).setServerPath(object.getString(AppConstants.SERVER_ADDRESS));
                     }
-                    if(keySet.contains(AppConstants.TOKEN)){
+                    if(keySet.contains(AppConstants.TOKEN) && ((GlobalVariables) application).getToken() == null){
                         ((GlobalVariables) application).setToken(object.getString(AppConstants.TOKEN));
                     }
                 }
@@ -317,8 +317,6 @@ public class MainActivity extends AppCompatActivity {
             final int cacheSize = maxMemory / 16;
 
             ((GlobalVariables) application).setStringMemoryCache(new LruCache<String, String>(cacheSize));
-
-            redirectToAuthorizationActivity();
         }
     }
 
