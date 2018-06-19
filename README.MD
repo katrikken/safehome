@@ -1,4 +1,4 @@
-# Safe Home compilation
+# Safe Home
 
 Safe Home is an application for the bachelor thesis "Home alarm system". In this README we describe the contents of this source.
 
